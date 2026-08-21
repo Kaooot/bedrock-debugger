@@ -125,8 +125,7 @@ public class BedrockDebuggerProxy {
         this.msaAuth.doPrompt(accountsConfig, config);
 
         this.keyPair = EncryptionUtils.createKeyPair();
-        this.loadPacks = Registries.<ConfigRegistry>getRegistry(RegistryKey.CONFIG)
-            .get(SettingsConfig.class).isLoadPacks();
+        this.loadPacks = configRegistry.get(SettingsConfig.class).isLoadPacks();
         this.packManager = new PackManager();
         if (this.loadPacks) {
             this.packManager.loadPacks(this);

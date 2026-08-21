@@ -77,7 +77,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
     private final ImBoolean imGuiTabOpen = new ImBoolean(false);
     private final ImBoolean blockDebugTabOpen = new ImBoolean(false);
     private final ImBoolean levelSoundEventDebugTabOpen = new ImBoolean(false);
-    private final ImBoolean packetLogTabOpen = new ImBoolean(false);
+    private final ImBoolean packetListTabOpen = new ImBoolean(false);
     private final ImBoolean weatherDebugTabOpen = new ImBoolean(false);
     private final ImBoolean personaDebugTabOpen = new ImBoolean(false);
     private final ImBoolean antiCheatTestingTabOpen = new ImBoolean(false);
@@ -106,7 +106,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
         proxy.getImGuiAdapter().removeWindow("block");
         proxy.getImGuiAdapter().removeWindow("levelSoundEvent");
         proxy.getImGuiAdapter().removeWindow("ac");
-        proxy.getImGuiAdapter().removeWindow("packet_log");
+        proxy.getImGuiAdapter().removeWindow("packet_list");
         proxy.getImGuiAdapter().removeWindow("weather");
         proxy.getImGuiAdapter().removeWindow("persona");
         proxy.getImGuiAdapter().removeWindow("debug1");
@@ -122,8 +122,8 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             this.renderTab(this.blockDebugTabOpen, "Block Debug");
             ImGui.sameLine();
             this.renderTab(this.levelSoundEventDebugTabOpen, "LevelSoundEvent Debug");
-//            ImGui.sameLine();
-//            this.renderTab(this.packetLogTabOpen, "Packet Log");
+            ImGui.sameLine();
+            this.renderTab(this.packetListTabOpen, "Packet List");
             ImGui.sameLine();
             this.renderTab(this.weatherDebugTabOpen, "Weather Debug");
             ImGui.sameLine();
@@ -143,8 +143,8 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             if (this.levelSoundEventDebugTabOpen.get()) {
                 this.renderLevelSoundEventDebug();
             }
-            if (this.packetLogTabOpen.get()) {
-//                this.renderPacketLog();
+            if (this.packetListTabOpen.get()) {
+                this.renderPacketList();
             }
             if (this.weatherDebugTabOpen.get()) {
                 this.renderWeatherDebug();
@@ -295,19 +295,19 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
         ImGui.end();
     }
 
-    private void renderPacketLog() {
+    private void renderPacketList() {
         ImGui.setNextWindowSizeConstraints(0f, 500f, 600f, 500);
-        if (ImGui.begin("Packet Log", ImGuiWindowFlags.NoCollapse)) {
-            this.proxy.getImGuiAdapter().trackWindow("packet_log");
+        if (ImGui.begin("Packet List", ImGuiWindowFlags.NoCollapse)) {
+            this.proxy.getImGuiAdapter().trackWindow("packet_list");
 
             ImGui.inputText("Filter", this.filter);
 
-            if (ImGui.beginTable("Packets", 4,
+            if (ImGui.beginTable("Packets", 3,
                 ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
                 ImGui.tableSetupColumn("Recipient", ImGuiTableColumnFlags.WidthFixed, 70.0f);
                 ImGui.tableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 50.0f);
                 ImGui.tableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 250.0f);
-                ImGui.tableSetupColumn("View", ImGuiTableColumnFlags.WidthFixed, 150.0f);
+//                ImGui.tableSetupColumn("View", ImGuiTableColumnFlags.WidthFixed, 150.0f);
                 ImGui.tableHeadersRow();
 
                 final List<Map.Entry<BedrockPacketType, BedrockPacket>> list = this.packets
@@ -332,10 +332,10 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                     ImGui.text(String.valueOf(definition.getId()));
                     ImGui.tableSetColumnIndex(2);
                     ImGui.text(packet.getClass().getSimpleName());
-                    ImGui.tableSetColumnIndex(3);
+                   /* ImGui.tableSetColumnIndex(3);
                     if (ImGui.button("Copy to Clipboard##" + entry.getKey().name())) {
                         ImGui.setClipboardText(packet.toString());
-                    }
+                    }*/
                 }
                 ImGui.endTable();
             }

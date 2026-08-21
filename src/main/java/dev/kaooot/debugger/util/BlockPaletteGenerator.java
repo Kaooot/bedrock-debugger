@@ -217,18 +217,11 @@ public class BlockPaletteGenerator {
                 final JsonObject block = element.getAsJsonObject();
                 final String name = block.get("name").getAsString();
 
-                    /*if (!blockNames.contains(name)) {
-                        System.out.println(name + " is not present in mojang blocks");
-                        continue;
-                    }*/
-
                 JsonObject obj = block.getAsJsonObject("states");
 
                 final Set<String> stateNames = actualStates.getOrDefault(name, new HashSet<>());
                 for (String stateName : stateNames) {
                     if (obj == null || !obj.has(stateName)) {
-                            /*System.out.println("missing state found for " + name + ": " +
-                                stateName);*/
                         final JsonArray jsonArray1 = new JsonArray();
                         for (Object o : allProperties.get(name).get(stateName)) {
                             if (o instanceof Number number) {
