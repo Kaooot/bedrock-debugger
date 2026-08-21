@@ -1,0 +1,28 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Debug Pack",
+    "uuid": "b7187749-6955-45c8-8174-97f2f31a855d",
+    "version": [
+      0,
+      0,
+      8
+    ],
+    "min_engine_version": [
+      1,
+      16,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "52a08d4a-1491-4ecc-af24-ea5fd0a021b1",
+      "version": [
+        0,
+        0,
+        9
+      ]
+    }
+  ]
+}
