@@ -1,6 +1,6 @@
 # bedrock-debugger
 
-Copyright (c) 2026 Kaooot. All rights reserved.
+Copyright (c) Kaooot. All rights reserved.
 
 Commercial use, redistribution, publication, and distribution of modified versions are not permitted without explicit
 permission from the copyright holder.

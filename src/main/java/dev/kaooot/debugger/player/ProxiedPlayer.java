@@ -533,7 +533,7 @@ public class ProxiedPlayer {
         this.enhancedFlightSpeedToggled = !this.enhancedFlightSpeedToggled;
 
         this.sendMessage(
-            (this.enhancedFlightSpeedToggled ? "Enabled" : "Disabled") + " enhanced flight speed"
+            (this.enhancedFlightSpeedToggled ? "Enabled" : "Disabled") + " enhanced fly speed"
         );
 
         final UpdateAbilitiesPacket updateAbilitiesPacket = new UpdateAbilitiesPacket();

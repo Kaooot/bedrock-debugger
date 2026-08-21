@@ -516,28 +516,29 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             }
 
             final SerializedSkin serializedSkin = this.proxy.getPlayer().getSerializedSkin();
+            if (serializedSkin.isPersona()) {
+                ImGui.text("Persona Pieces");
+                if (ImGui.beginTable("Persona Pieces", 2,
+                    ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
+                    ImGui.tableSetupColumn("Piece Id");
+                    ImGui.tableSetupColumn("Piece Type");
+                    ImGui.tableHeadersRow();
 
-            ImGui.text("Persona Pieces");
-            if (ImGui.beginTable("Persona Pieces", 2,
-                ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
-                ImGui.tableSetupColumn("Piece Id");
-                ImGui.tableSetupColumn("Piece Type");
-                ImGui.tableHeadersRow();
-
-                for (final SerializedPersonaPieceHandle handle : serializedSkin.getPersonaPieces()) {
-                    ImGui.tableNextRow();
-                    ImGui.tableSetColumnIndex(0);
-                    ImGui.text(handle.getPieceId());
-                    ImGui.tableSetColumnIndex(1);
-                    ImGui.text(handle.getPieceType().getId());
+                    for (final SerializedPersonaPieceHandle handle : serializedSkin.getPersonaPieces()) {
+                        ImGui.tableNextRow();
+                        ImGui.tableSetColumnIndex(0);
+                        ImGui.text(handle.getPieceId());
+                        ImGui.tableSetColumnIndex(1);
+                        ImGui.text(handle.getPieceType().getId());
+                    }
+                    ImGui.endTable();
                 }
-                ImGui.endTable();
-            }
 
-            ImGui.text("Piece Tint Colors");
-            for (final Map.Entry<PieceType, TintMapColor> entry : serializedSkin.getPieceTintColors()
-                .entrySet()) {
-                ImGui.text(entry.getKey().getId() + " " + entry.getValue().getColors());
+                ImGui.text("Piece Tint Colors");
+                for (final Map.Entry<PieceType, TintMapColor> entry : serializedSkin.getPieceTintColors()
+                    .entrySet()) {
+                    ImGui.text(entry.getKey().getId() + " " + entry.getValue().getColors());
+                }
             }
         }
         ImGui.end();

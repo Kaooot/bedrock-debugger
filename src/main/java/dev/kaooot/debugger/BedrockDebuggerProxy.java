@@ -202,28 +202,6 @@ public class BedrockDebuggerProxy {
         this.connect(remoteAddress, remotePort);
     }
 
-    public long generateActorId() {
-        long actorId = new SecureRandom().nextInt(999999, 999999999);
-        final Set<Long> usedActorIds = this.getUsedActorIds();
-        while (usedActorIds.contains(actorId)) {
-            actorId = new SecureRandom().nextInt(999999, 999999999);
-        }
-        return actorId;
-    }
-
-    private LongSet getUsedActorIds() {
-        final LongSet list = new LongOpenHashSet();
-        for (final Actor actor : this.actors) {
-            list.add(actor.getActorId());
-            list.add(actor.getRuntimeId());
-        }
-        for (final ServerPlayer player : this.players) {
-            list.add(player.getActorId());
-            list.add(player.getRuntimeId());
-        }
-        return list;
-    }
-
     private void shutdownIfDisconnected() {
         while (true) {
             try {

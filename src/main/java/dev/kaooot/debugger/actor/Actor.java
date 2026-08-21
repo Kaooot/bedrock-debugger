@@ -66,14 +66,6 @@ public class Actor {
 
     private String prettifiedActorType;
 
-    public Actor(BedrockDebuggerProxy proxy, String identifier, Vector3f position) {
-        this.proxy = proxy;
-        this.identifier = identifier;
-        this.position = position;
-        this.actorId = proxy.generateActorId();
-        this.runtimeId = this.actorId;
-    }
-
     public Actor(BedrockDebuggerProxy proxy, String identifier, Vector3f position, long actorId,
                  long runtimeId) {
         this.proxy = proxy;
