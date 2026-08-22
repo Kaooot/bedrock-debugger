@@ -1,8 +1,5 @@
 package dev.kaooot.debugger.network;
 
-import org.cloudburstmc.protocol.bedrock.packet.BedrockPacket;
-import org.cloudburstmc.protocol.bedrock.packet.BedrockPacketHandler;
-import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
@@ -10,6 +7,9 @@ import dev.kaooot.debugger.imgui.ImGuiRendererRegistry;
 import dev.kaooot.debugger.imgui.renderer.ImGuiMainRenderer;
 import dev.kaooot.debugger.screen.ClientNetworkStatsScreen;
 import dev.kaooot.debugger.screen.DebugScreenRegistry;
+import org.cloudburstmc.protocol.bedrock.packet.BedrockPacket;
+import org.cloudburstmc.protocol.bedrock.packet.BedrockPacketHandler;
+import org.cloudburstmc.protocol.common.PacketSignal;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

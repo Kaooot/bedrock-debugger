@@ -4,6 +4,7 @@ import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.level.block.Block;
 import dev.kaooot.debugger.level.storage.SubChunkStorage;
 import dev.kaooot.debugger.util.Util;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,10 +35,22 @@ public class LevelSubChunk {
         } else {
             System.arraycopy(storages, 0, this.storages, 0, storages.length);
         }
+        if (this.storages[0] == null) {
+            this.storages[0] = new SubChunkStorage<>(Block.AIR);
+        }
+        if (this.storages[1] == null) {
+            this.storages[1] = new SubChunkStorage<>(Block.AIR);
+        }
     }
 
     public void setBlock(int x, int y, int z, int layer, Block block) {
-        this.storages[layer].set(Util.indexOf(x, y, z), block);
+        try {
+            this.storages[layer].set(Util.indexOf(x, y, z), block);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("layer: " + layer);
+            System.out.println(Arrays.toString(this.storages));
+        }
     }
 
     public Block getBlock(int x, int y, int z, int layer) {

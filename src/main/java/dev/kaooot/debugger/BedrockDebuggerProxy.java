@@ -100,7 +100,7 @@ public class BedrockDebuggerProxy {
 
     public BedrockDebuggerProxy() {
         System.setProperty("bedrock.maxDecompressedBytes", String.valueOf(Integer.MAX_VALUE));
-        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
+//        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
 
         this.getLogger().info(
             "Starting bedrock-debugger v" +

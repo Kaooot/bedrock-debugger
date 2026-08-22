@@ -56,19 +56,23 @@ public class SubChunkHandler implements PacketHandler<SubChunkPacket> {
                     storages
                 );
             } else {
-                final ByteBuf serializedSubChunk =
-                    subChunkPacketData.getSerializedSubChunk().copy();
-                playerChunkManager.readSubChunk(
-                    serializedSubChunk,
-                    subChunkIndex,
-                    chunkX,
-                    chunkZ,
-                    dimension
-                );
-                playerChunkManager.readBorderBlocks(serializedSubChunk);
+                final ByteBuf serializedSubChunk = subChunkPacketData.getSerializedSubChunk()
+                    .copy();
+                try {
+                    playerChunkManager.readSubChunk(
+                        serializedSubChunk,
+                        subChunkIndex,
+                        chunkX,
+                        chunkZ,
+                        dimension
+                    );
+                    playerChunkManager.readBorderBlocks(serializedSubChunk);
 
-                final LevelChunk levelChunk = playerChunkManager.getChunk(chunkX, chunkZ);
-                playerChunkManager.readBlockActorDataTags(serializedSubChunk, levelChunk);
+                    final LevelChunk levelChunk = playerChunkManager.getChunk(chunkX, chunkZ);
+                    playerChunkManager.readBlockActorDataTags(serializedSubChunk, levelChunk);
+                } finally {
+                    serializedSubChunk.release();
+                }
             }
         }
         return PacketSignal.UNHANDLED;

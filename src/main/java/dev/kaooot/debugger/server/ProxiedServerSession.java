@@ -42,13 +42,17 @@ public class ProxiedServerSession extends BedrockServerSession {
                     wrapper.getPacketId(), ByteBufUtil.hexDump(wrapper.getPacketBuffer()));
             }
 
-            final BedrockPacket pk = this.proxy.getClient().getCodec().tryDecode(
-                this.proxy.getClient().getCodecHelper(),
-                buffer,
-                wrapper.getPacketId(),
-                PacketRecipient.SERVER
-            );
-            this.proxy.getClient().sendPacket(pk);
+            try {
+                final BedrockPacket pk = this.proxy.getClient().getCodec().tryDecode(
+                    this.proxy.getClient().getCodecHelper(),
+                    buffer,
+                    wrapper.getPacketId(),
+                    PacketRecipient.SERVER
+                );
+                this.proxy.getClient().sendPacket(pk);
+            } finally {
+                buffer.release();
+            }
         }
     }
 }
