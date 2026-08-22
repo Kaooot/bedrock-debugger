@@ -4,6 +4,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Converter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,13 +14,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.cloudburstmc.nbt.NBTOutputStream;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
 import org.cloudburstmc.nbt.NbtType;
 import org.cloudburstmc.nbt.NbtUtils;
+import org.cloudburstmc.protocol.bedrock.data.BuildPlatform;
+import org.cloudburstmc.protocol.bedrock.data.ClientPlayMode;
 import org.cloudburstmc.protocol.bedrock.data.ControlScheme;
+import org.cloudburstmc.protocol.bedrock.data.InputInteractionModel;
+import org.cloudburstmc.protocol.bedrock.data.InputMode;
+import org.cloudburstmc.protocol.bedrock.data.PlatformType;
 import org.cloudburstmc.protocol.bedrock.data.TrimMaterial;
 import org.cloudburstmc.protocol.bedrock.data.TrimPattern;
 import org.cloudburstmc.protocol.bedrock.data.camera.CameraAimAssistCategory;
@@ -40,8 +47,51 @@ import dev.kaooot.debugger.BedrockDebuggerProxy;
 @UtilityClass
 public class Util {
 
+    private final Map<PlatformType, BuildPlatform> BUILD_PLATFORM_MAP =
+        new Object2ObjectOpenHashMap<>();
+    private final Map<PlatformType, InputMode> INPUT_MODE_MAP =
+        new Object2ObjectOpenHashMap<>();
+    private final Map<PlatformType, ClientPlayMode> CLIENT_PLAY_MODE_MAP =
+        new Object2ObjectOpenHashMap<>();
+    private final Map<PlatformType, InputInteractionModel> INPUT_INTERACTION_MODEL_MAP =
+        new Object2ObjectOpenHashMap<>();
+
+    static {
+        BUILD_PLATFORM_MAP.put(PlatformType.DESKTOP, BuildPlatform.WIN_32);
+        BUILD_PLATFORM_MAP.put(PlatformType.CONSOLE, BuildPlatform.XBOX);
+        BUILD_PLATFORM_MAP.put(PlatformType.MOBILE, BuildPlatform.GOOGLE);
+
+        INPUT_MODE_MAP.put(PlatformType.DESKTOP, InputMode.MOUSE);
+        INPUT_MODE_MAP.put(PlatformType.CONSOLE, InputMode.GAME_PAD);
+        INPUT_MODE_MAP.put(PlatformType.MOBILE, InputMode.TOUCH);
+
+        CLIENT_PLAY_MODE_MAP.put(PlatformType.DESKTOP, ClientPlayMode.SCREEN);
+        CLIENT_PLAY_MODE_MAP.put(PlatformType.CONSOLE, ClientPlayMode.SCREEN);
+        CLIENT_PLAY_MODE_MAP.put(PlatformType.MOBILE, ClientPlayMode.NORMAL);
+
+        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.DESKTOP, InputInteractionModel.CLASSIC);
+        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.CONSOLE, InputInteractionModel.CLASSIC);
+        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.MOBILE, InputInteractionModel.TOUCH);
+    }
+
     public final Converter<String, String> CONVERTER = CaseFormat.UPPER_UNDERSCORE
         .converterTo(CaseFormat.UPPER_CAMEL);
+
+    public BuildPlatform getBuildPlatform(PlatformType type) {
+        return BUILD_PLATFORM_MAP.get(type);
+    }
+
+    public InputMode getInputMode(PlatformType type) {
+        return INPUT_MODE_MAP.get(type);
+    }
+
+    public ClientPlayMode getClientPlayMode(PlatformType type) {
+        return CLIENT_PLAY_MODE_MAP.get(type);
+    }
+
+    public InputInteractionModel getInputInteractionModel(PlatformType type) {
+        return INPUT_INTERACTION_MODEL_MAP.get(type);
+    }
 
     public int indexOf(int x, int y, int z) {
         return ((x & 15) << 8) + ((z & 15) << 4) + (y & 15);

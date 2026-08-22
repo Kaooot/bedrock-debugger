@@ -2,24 +2,6 @@ package dev.kaooot.debugger.network.handler;
 
 import com.google.gson.JsonObject;
 import com.nimbusds.jose.JWSObject;
-import java.security.KeyPair;
-import java.security.interfaces.ECPublicKey;
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-import org.cloudburstmc.protocol.bedrock.data.BuildPlatform;
-import org.cloudburstmc.protocol.bedrock.data.GraphicsMode;
-import org.cloudburstmc.protocol.bedrock.data.InputMode;
-import org.cloudburstmc.protocol.bedrock.data.MemoryTier;
-import org.cloudburstmc.protocol.bedrock.data.PlatformType;
-import org.cloudburstmc.protocol.bedrock.data.UserInterfaceProfile;
-import org.cloudburstmc.protocol.bedrock.data.auth.PlayerAuthenticationType;
-import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition;
-import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition;
-import org.cloudburstmc.protocol.bedrock.packet.LoginPacket;
-import org.cloudburstmc.protocol.common.DefinitionRegistry;
-import org.cloudburstmc.protocol.common.PacketSignal;
-import org.cloudburstmc.protocol.common.SimpleDefinitionRegistry;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.api.auth.util.AuthExtraData;
 import dev.kaooot.debugger.api.auth.util.ForgeryUtil;
@@ -33,6 +15,24 @@ import dev.kaooot.debugger.network.PacketHandler;
 import dev.kaooot.debugger.player.ProxiedPlayer;
 import dev.kaooot.debugger.player.login.LoginData;
 import dev.kaooot.debugger.util.BedrockGameVersion;
+import dev.kaooot.debugger.util.Util;
+import java.security.KeyPair;
+import java.security.interfaces.ECPublicKey;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+import org.cloudburstmc.protocol.bedrock.data.GraphicsMode;
+import org.cloudburstmc.protocol.bedrock.data.InputMode;
+import org.cloudburstmc.protocol.bedrock.data.MemoryTier;
+import org.cloudburstmc.protocol.bedrock.data.PlatformType;
+import org.cloudburstmc.protocol.bedrock.data.UserInterfaceProfile;
+import org.cloudburstmc.protocol.bedrock.data.auth.PlayerAuthenticationType;
+import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition;
+import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition;
+import org.cloudburstmc.protocol.bedrock.packet.LoginPacket;
+import org.cloudburstmc.protocol.common.DefinitionRegistry;
+import org.cloudburstmc.protocol.common.PacketSignal;
+import org.cloudburstmc.protocol.common.SimpleDefinitionRegistry;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -73,12 +73,14 @@ public class LoginHandler implements PacketHandler<LoginPacket> {
                 .get(SettingsConfig.class);
 
             final String address = proxy.getRemoteAddress() + ":" + proxy.getRemotePort();
+            final PlatformType platformType = settingsConfig.getPlatformType();
+            final InputMode inputMode = Util.getInputMode(platformType);
             final Map<String, Object> modifiedExtra = new HashMap<>();
-            modifiedExtra.put("DeviceOS", BuildPlatform.GOOGLE.getId());
-            modifiedExtra.put("DefaultInputMode", InputMode.TOUCH.ordinal());
-            modifiedExtra.put("CurrentInputMode", InputMode.TOUCH.ordinal());
+            modifiedExtra.put("DeviceOS", Util.getBuildPlatform(platformType).getId());
+            modifiedExtra.put("DefaultInputMode", inputMode.ordinal());
+            modifiedExtra.put("CurrentInputMode", inputMode.ordinal());
             modifiedExtra.put("MemoryTier", MemoryTier.LOW.ordinal());
-            modifiedExtra.put("PlatformType", PlatformType.MOBILE.ordinal());
+            modifiedExtra.put("PlatformType", platformType.ordinal());
             modifiedExtra.put("UIProfile", UserInterfaceProfile.CLASSIC.ordinal());
             modifiedExtra.put("DeviceModel", "");
 

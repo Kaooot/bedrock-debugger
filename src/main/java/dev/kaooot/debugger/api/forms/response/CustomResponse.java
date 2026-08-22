@@ -32,7 +32,7 @@ public class CustomResponse {
         return this.getResponse(id);
     }
 
-    public Float getStepSliderResponse(String id) {
+    public String getStepSliderResponse(String id) {
         return this.getResponse(id);
     }
 

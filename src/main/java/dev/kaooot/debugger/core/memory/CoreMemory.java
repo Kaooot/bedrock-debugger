@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
  */
 public class CoreMemory implements AutoCloseable {
 
-    public static final String LEVEL_SOUND_EVENT_ANCHOR = "item.use.on";
-    public static final String PARTICLE_TYPE_ANCHOR = "none";
+    private static final String LEVEL_SOUND_EVENT_ANCHOR = "item.use.on";
+    private static final String PARTICLE_TYPE_ANCHOR = "none";
 
     private static final Pattern IDENTIFIER = Pattern.compile("[a-z][a-z0-9_.]*");
     private static final int DEFAULT_MAX_GAP = 2048;

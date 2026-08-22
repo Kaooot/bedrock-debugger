@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import dev.kaooot.debugger.api.config.Config;
+import org.cloudburstmc.protocol.bedrock.data.PlatformType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -72,6 +73,8 @@ public class SettingsConfig extends Config {
     private boolean forceDisableServerAuthBlockBreaking;
     @SerializedName("zone_id_override")
     private String zoneIdOverride = "";
+    @SerializedName("platform_type")
+    private PlatformType platformType = PlatformType.MOBILE;
 
     @Override
     public String getName() {

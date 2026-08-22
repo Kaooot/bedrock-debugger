@@ -1,16 +1,15 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.ClientPlayMode;
-import org.cloudburstmc.protocol.bedrock.data.InputInteractionModel;
-import org.cloudburstmc.protocol.bedrock.data.InputMode;
-import org.cloudburstmc.protocol.bedrock.packet.PlayerAuthInputPacket;
-import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.config.ConfigRegistry;
 import dev.kaooot.debugger.config.SettingsConfig;
 import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
 import dev.kaooot.debugger.network.PacketHandler;
+import dev.kaooot.debugger.util.Util;
+import org.cloudburstmc.protocol.bedrock.data.PlatformType;
+import org.cloudburstmc.protocol.bedrock.packet.PlayerAuthInputPacket;
+import org.cloudburstmc.protocol.common.PacketSignal;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -28,13 +27,14 @@ public class PlayerAuthInputHandler implements PacketHandler<PlayerAuthInputPack
         proxy.getPlayer().setPosition(packet.getPosition());
         proxy.getPlayer().setRotation(packet.getPlayerRotation());
 
-        packet.setInputMode(InputMode.TOUCH);
-        packet.setPlayMode(ClientPlayMode.NORMAL);
-        packet.setNewInteractionModel(InputInteractionModel.TOUCH);
-
         final SettingsConfig settingsConfig = Registries.
             <ConfigRegistry>getRegistry(RegistryKey.CONFIG)
             .get(SettingsConfig.class);
+        final PlatformType platformType = settingsConfig.getPlatformType();
+
+        packet.setInputMode(Util.getInputMode(platformType));
+        packet.setPlayMode(Util.getClientPlayMode(platformType));
+        packet.setNewInteractionModel(Util.getInputInteractionModel(platformType));
 
         if (proxy.getPlayer().isReadyToRoll() && settingsConfig.isRenderCurrentChunk()) {
             proxy.getPlayer().updateChunkPosForRenderingIfEnabled(settingsConfig);

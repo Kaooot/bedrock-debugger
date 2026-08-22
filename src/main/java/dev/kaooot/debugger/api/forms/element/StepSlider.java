@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -15,6 +17,9 @@ public class StepSlider extends Element {
 
     private final List<String> steps = new ObjectArrayList<>();
     private int defaultStep;
+    @Setter
+    @Getter
+    private String tooltip;
 
     @Override
     public JsonObject toJson() {
@@ -26,6 +31,9 @@ public class StepSlider extends Element {
         }
         jsonObject.add("steps", steps);
         jsonObject.addProperty("default", this.defaultStep);
+        if (this.tooltip != null) {
+            jsonObject.addProperty("tooltip", this.tooltip);
+        }
         return jsonObject;
     }
 

@@ -1,12 +1,5 @@
 package dev.kaooot.debugger.menu;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.io.File;
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.actor.Actor;
 import dev.kaooot.debugger.api.forms.CustomForm;
@@ -16,6 +9,7 @@ import dev.kaooot.debugger.api.forms.element.Element;
 import dev.kaooot.debugger.api.forms.element.Header;
 import dev.kaooot.debugger.api.forms.element.Input;
 import dev.kaooot.debugger.api.forms.element.Label;
+import dev.kaooot.debugger.api.forms.element.StepSlider;
 import dev.kaooot.debugger.api.forms.element.Toggle;
 import dev.kaooot.debugger.api.forms.response.CustomResponse;
 import dev.kaooot.debugger.config.ConfigRegistry;
@@ -25,6 +19,15 @@ import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
 import dev.kaooot.debugger.player.ServerPlayer;
 import dev.kaooot.debugger.util.DebugElement;
+import dev.kaooot.debugger.util.Util;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.io.File;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import org.cloudburstmc.protocol.bedrock.data.PlatformType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -152,6 +155,26 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         renderExperimentInfoToggle.setDefaultValue(settingsConfig.isRenderExperimentInfo());
         renderExperimentInfoToggle.setTooltip(
             "Enables experiment info rendering. Defaults to true."
+        );
+
+        final StepSlider platformTypeSlider = new StepSlider();
+        platformTypeSlider.setId("slider-platform_type");
+        platformTypeSlider.setText("Platform Type Override");
+        platformTypeSlider.addStep(
+            Util.CONVERTER.convert(PlatformType.DESKTOP.name()),
+            settingsConfig.getPlatformType().equals(PlatformType.DESKTOP)
+        );
+        platformTypeSlider.addStep(
+            Util.CONVERTER.convert(PlatformType.CONSOLE.name()),
+            settingsConfig.getPlatformType().equals(PlatformType.CONSOLE)
+        );
+        platformTypeSlider.addStep(
+            Util.CONVERTER.convert(PlatformType.MOBILE.name()),
+            settingsConfig.getPlatformType().equals(PlatformType.MOBILE)
+        );
+        platformTypeSlider.setTooltip(
+            "Platform Type Override used for Device Simulation, DeviceOS is sent exclusively in " +
+                "the LoginPacket"
         );
 
         final Input zoneIdOverrideInput = new Input();
@@ -302,6 +325,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 commandsToggle, renderBuildInfoToggle, renderExperimentInfoToggle,
                 spoofDeviceIDToggle,
                 cnsScreenMinPacketNumInput,
+                platformTypeSlider,
                 zoneIdOverrideInput,
                 divider,
                 playerDebugRendererLabel,
@@ -393,6 +417,9 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             "toggle-force_disable_server_auth_block_breaking"
         );
         final String zoneIdOverride = response.getInputResponse("input-zone_id_override");
+        final int platformTypeOrdinal = Integer.parseInt(
+            response.getStepSliderResponse("slider-platform_type")
+        );
 
         this.updateToggle(blobCache, settingsConfig.isClientBlobCacheEnabled(),
             settingsConfig::setClientBlobCacheEnabled, proxy, "Client Blob Cache");
@@ -509,6 +536,14 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         } catch (NumberFormatException e) {
             proxy.getPlayer().sendMessage("§cInvalid number");
             return;
+        }
+
+        final PlatformType platformType = PlatformType.from(platformTypeOrdinal);
+        if (!settingsConfig.getPlatformType().equals(platformType)) {
+            settingsConfig.setPlatformType(platformType);
+            proxy.getPlayer().sendMessage("Set Platform Type to " +
+                Util.CONVERTER.convert(platformType.name())
+            );
         }
 
         try {

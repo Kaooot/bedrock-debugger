@@ -9,6 +9,7 @@ import dev.kaooot.debugger.util.DebugElement;
 import dev.kaooot.debugger.util.Util;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
+import org.cloudburstmc.protocol.bedrock.data.PlatformType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -38,6 +39,8 @@ public class NormalDebugScreen implements DebugScreen {
     public List<String> getInfos(BedrockDebuggerProxy proxy) {
         final int chunkX = proxy.getPlayer().getChunkX();
         final int chunkZ = proxy.getPlayer().getChunkZ();
+        final SettingsConfig settingsConfig = Registries.<ConfigRegistry>
+            getRegistry(RegistryKey.CONFIG).get(SettingsConfig.class);
         final List<String> infos = new ObjectArrayList<>();
         infos.add(
             "Minecraft " + proxy.getDebugScreenInfo().getMinecraftVersion()
@@ -81,10 +84,17 @@ public class NormalDebugScreen implements DebugScreen {
                 !proxy.getPlayer().getCurrentStructureFeature().equalsIgnoreCase("null") ?
                 "Structure: " + proxy.getPlayer().getCurrentStructureFeature() : ""
         );
+        if (!settingsConfig.getPlatformType().equals(PlatformType.MOBILE)) {
+            infos.add(
+                "§eBuildPlatform Override:§r " +
+                    Util.CONVERTER.convert(
+                        Util.getBuildPlatform(settingsConfig.getPlatformType()).name()
+                    )
+            );
+        }
         infos.add(
             !proxy.getPlayer().getExperiments().isEmpty() &&
-                Registries.<ConfigRegistry>getRegistry(RegistryKey.CONFIG)
-                    .get(SettingsConfig.class).isRenderExperimentInfo() ? "Experiments:\n- " +
+                settingsConfig.isRenderExperimentInfo() ? "Experiments:\n- " +
                 String.join("\n- ", proxy.getPlayer().getExperiments()) : ""
         );
         return infos;
