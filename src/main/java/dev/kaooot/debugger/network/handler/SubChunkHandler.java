@@ -27,6 +27,9 @@ public class SubChunkHandler implements PacketHandler<SubChunkPacket> {
         final DimensionType dimension = packet.getDimensionType();
         final PlayerChunkManager playerChunkManager = proxy.getPlayer().getPlayerChunkManager();
         for (final SubChunkPacketData subChunkPacketData : packet.getSubChunkData()) {
+            if (subChunkPacketData.getBlobId() != null) {
+                return PacketSignal.UNHANDLED;
+            }
             final SubChunkRequestResult result = subChunkPacketData.getSubChunkRequestResult();
 
             if (!result.equals(SubChunkRequestResult.SUCCESS) &&
@@ -53,7 +56,8 @@ public class SubChunkHandler implements PacketHandler<SubChunkPacket> {
                     storages
                 );
             } else {
-                final ByteBuf serializedSubChunk = subChunkPacketData.getSerializedSubChunk().copy();
+                final ByteBuf serializedSubChunk =
+                    subChunkPacketData.getSerializedSubChunk().copy();
                 playerChunkManager.readSubChunk(
                     serializedSubChunk,
                     subChunkIndex,

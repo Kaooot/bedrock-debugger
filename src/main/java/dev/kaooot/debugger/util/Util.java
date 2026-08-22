@@ -77,6 +77,41 @@ public class Util {
     public final Converter<String, String> CONVERTER = CaseFormat.UPPER_UNDERSCORE
         .converterTo(CaseFormat.UPPER_CAMEL);
 
+    public int[] toRgba(int color) {
+        return new int[]{
+            (color >> 16) & 0xFF,
+            (color >> 8) & 0xFF,
+            color & 0xFF,
+            (color >> 24) & 0xFF
+        };
+    }
+
+    public float[] toFloats(int color) {
+        final int[] rgba = toRgba(color);
+        return new float[]{
+            rgba[0] / 255f,
+            rgba[1] / 255f,
+            rgba[2] / 255f,
+            rgba[3] / 255f
+        };
+    }
+
+    public int fromRgba(int[] rgba) {
+        return ((rgba[3] & 0xFF) << 24) |
+            ((rgba[0] & 0xFF) << 16) |
+            ((rgba[1] & 0xFF) << 8) |
+            (rgba[2] & 0xFF);
+    }
+
+    public int fromFloats(float[] rgba) {
+        return fromRgba(new int[]{
+            Math.round(rgba[0] * 255f),
+            Math.round(rgba[1] * 255f),
+            Math.round(rgba[2] * 255f),
+            Math.round(rgba[3] * 255f)
+        });
+    }
+
     public BuildPlatform getBuildPlatform(PlatformType type) {
         return BUILD_PLATFORM_MAP.get(type);
     }

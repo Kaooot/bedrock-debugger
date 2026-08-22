@@ -189,6 +189,10 @@ public class DebugShapeRenderer {
             shapes.add(payload);
         }
 
+        if (shapes.isEmpty()) {
+            return;
+        }
+
         this.shapes.removeIf(shape -> predicate.test(shape.getId()));
 
         for (final PrimitiveShapeDataPayload shape : shapes) {

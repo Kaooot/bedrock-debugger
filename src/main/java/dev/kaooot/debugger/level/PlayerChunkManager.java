@@ -51,17 +51,22 @@ public class PlayerChunkManager {
 
     public void updateSubChunk(int chunkX, int chunkZ, DimensionType dimension, int index,
                                SubChunkStorage<Block>[] storages) {
-        this.getChunk(chunkX, chunkZ, dimension).setSubChunk(
+        final LevelChunk chunk = this.getChunk(chunkX, chunkZ, dimension);
+        chunk.setSubChunk(
             new LevelSubChunk(
                 index,
                 storages,
                 this.proxy
             )
         );
+        this.player.updateCustomBlockDebugMarkers(chunk);
     }
 
     public void handleUpdateSubChunkBlocks(UpdateSubChunkBlocksPacket packet) {
-        final LevelChunk chunk = this.getChunk(packet.getChunkX(), packet.getChunkZ());
+        final LevelChunk chunk = this.getChunk(
+            packet.getSubChunkBlockPosition().getX() >> 4,
+            packet.getSubChunkBlockPosition().getZ() >> 4
+        );
         if (chunk == null) {
             this.proxy.getLogger().debug(
                 "Received an UpdateSubChunkBlocks for an unrendered chunk: " + packet
@@ -69,13 +74,22 @@ public class PlayerChunkManager {
             return;
         }
         for (final BlockChangeEntry standardBlock : packet.getStandardBlocks()) {
+            final Vector3i blockPos = standardBlock.getPos();
+            final int runtimeId = standardBlock.getDefinition().getRuntimeId();
             chunk.setBlock(
-                standardBlock.getPos().getX(),
-                standardBlock.getPos().getY(),
-                standardBlock.getPos().getZ(),
+                blockPos.getX(),
+                blockPos.getY(),
+                blockPos.getZ(),
                 0,
-                standardBlock.getDefinition().getRuntimeId()
+                runtimeId
             );
+
+            if (Block.AIR.getBlockRuntimeId() == runtimeId) {
+                final String pos = blockPos.getX() + "," + blockPos.getY() + "," + blockPos.getZ();
+                this.proxy.getDebugShapeRenderer().clearShapes(
+                    shapeId -> shapeId.startsWith("debug_marker_") && shapeId.contains(pos)
+                );
+            }
         }
         for (final BlockChangeEntry extraBlock : packet.getExtraBlocks()) {
             chunk.setBlock(
@@ -86,18 +100,27 @@ public class PlayerChunkManager {
                 extraBlock.getDefinition().getRuntimeId()
             );
         }
+        this.player.updateCustomBlockDebugMarkers(chunk);
     }
 
     public void handleUpdateBlock(BlockDefinition definition, Vector3i blockPos, int layer) {
         final int x = blockPos.getX() >> 4;
         final int z = blockPos.getZ() >> 4;
-        this.getChunk(x, z).setBlock(
+        final LevelChunk chunk = this.getChunk(x, z);
+        chunk.setBlock(
             blockPos.getX(),
             blockPos.getY(),
             blockPos.getZ(),
             layer,
             definition.getRuntimeId()
         );
+        if (Block.AIR.getBlockRuntimeId() == definition.getRuntimeId()) {
+            final String pos = blockPos.getX() + "," + blockPos.getY() + "," + blockPos.getZ();
+            this.proxy.getDebugShapeRenderer().clearShapes(
+                shapeId -> shapeId.startsWith("debug_marker_") && shapeId.contains(pos)
+            );
+        }
+        this.player.updateCustomBlockDebugMarkers(chunk);
     }
 
     public void handleBlockActorData(BlockActorDataPacket packet) {

@@ -4,7 +4,6 @@ import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.level.block.Block;
 import dev.kaooot.debugger.level.storage.SubChunkStorage;
 import dev.kaooot.debugger.util.Util;
-import java.util.function.BiConsumer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,12 +52,20 @@ public class LevelSubChunk {
         return this.biomeStorage.get(Util.indexOf(x, y, z));
     }
 
-    public void forEachBlock(int layer, BiConsumer<Integer, Block> consumer) {
+    public void forEachBlock(int layer, BlockConsumer consumer) {
         final SubChunkStorage<Block> storage = this.storages[layer];
         for (int index = 0; index < 4096; index++) {
             final int paletteIndex = storage.getBitArray().get(index);
             final Block block = storage.getPalette().get(paletteIndex);
-            consumer.accept(index, block);
+            final int blockX = (index >> 8) & 15;
+            final int blockZ = (index >> 4) & 15;
+            final int blockY = index & 15;
+            consumer.accept(blockX, blockY, blockZ, block);
         }
+    }
+
+    @FunctionalInterface
+    public interface BlockConsumer {
+        void accept(int x, int y, int z, Block block);
     }
 }

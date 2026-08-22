@@ -1105,9 +1105,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testUpdateSubChunkBlocks(BedrockDebuggerProxy proxy) {
         final UpdateSubChunkBlocksPacket packet = new UpdateSubChunkBlocksPacket();
-        packet.setChunkX(0);
-        packet.setChunkY(0);
-        packet.setChunkZ(0);
+        packet.setSubChunkBlockPosition(Vector3i.ZERO);
         packet.getStandardBlocks().add(new BlockChangeEntry(Vector3i.ZERO, () -> 0, 0, 0L,
             ActorBlockSyncMessageId.NONE));
         packet.getExtraBlocks().add(new BlockChangeEntry(Vector3i.ZERO, () -> 0, 0, 0L,

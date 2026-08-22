@@ -1,12 +1,18 @@
 package dev.kaooot.debugger.player;
 
+import dev.kaooot.debugger.api.shape.DebugText;
+import dev.kaooot.debugger.level.LevelChunk;
+import dev.kaooot.debugger.level.LevelSubChunk;
+import dev.kaooot.debugger.level.block.Block;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -231,6 +237,10 @@ public class ProxiedPlayer {
     @Getter
     @Setter
     private SerializedSkin serializedSkin;
+
+    @Getter
+    private final Map<String, DebugMarkerSettings> customBlockRenderSettings =
+        new Object2ObjectOpenHashMap<>();
 
     public ProxiedPlayer(BedrockDebuggerProxy proxy, AuthExtraData authExtraData,
                          LoginData loginData) {
@@ -533,7 +543,7 @@ public class ProxiedPlayer {
         this.enhancedFlightSpeedToggled = !this.enhancedFlightSpeedToggled;
 
         this.sendMessage(
-            (this.enhancedFlightSpeedToggled ? "Enabled" : "Disabled") + " enhanced fly speed"
+            (this.enhancedFlightSpeedToggled ? "Enabled" : "Disabled") + " Enhanced Fly Speed"
         );
 
         final UpdateAbilitiesPacket updateAbilitiesPacket = new UpdateAbilitiesPacket();
@@ -602,6 +612,47 @@ public class ProxiedPlayer {
             )
         );
         return box;
+    }
+
+    public void updateCustomBlockDebugMarkers(LevelChunk chunk) {
+        for (final LevelSubChunk subChunk : chunk.getSubChunks()) {
+            subChunk.forEachBlock(0, (localX, localY, localZ, block) -> {
+                if (block.getState() == null) {
+                    return;
+                }
+                final String name = block.getState().getString("name");
+                final int blockX = (chunk.getX() << 4) + localX;
+                final int blockY = (subChunk.getIndex() << 4) + localY;
+                final int blockZ = (chunk.getZ() << 4) + localZ;
+                if (this.customBlockRenderSettings.keySet().stream()
+                    .noneMatch(id -> id.equalsIgnoreCase(name))) {
+                    return;
+                }
+                this.updateCustomBlockDebugMarker(block, blockX, blockY, blockZ);
+            });
+        }
+    }
+
+    public void updateCustomBlockDebugMarker(Block block, int blockX, int blockY, int blockZ) {
+        for (final String id : this.customBlockRenderSettings.keySet()) {
+            if (block.getState().getString("name").equals(id)) {
+                final DebugMarkerSettings settings = this.customBlockRenderSettings.get(id);
+                final String textId = "debug_marker_" + id + "_" +
+                    blockX + "," + blockY + "," + blockZ;
+
+                final DebugText text = new DebugText();
+                text.setId(textId);
+                text.setText(id.split(":")[1]);
+                text.setLocation(Vector3f.from(blockX, blockY + 1, blockZ));
+                text.setDimension(this.proxy.getPlayer().getDimension());
+                text.setColor(settings.getTextColor());
+                text.setBackgroundColor(settings.getTextBackgroundColor());
+                text.setScale(1.5f);
+
+                this.proxy.getDebugShapeRenderer().renderShape(text);
+                break;
+            }
+        }
     }
 
     @Getter

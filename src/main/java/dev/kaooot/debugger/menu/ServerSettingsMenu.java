@@ -450,9 +450,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             }, proxy, "Player Debug Renderer");
         this.updateToggle(actorDebugRendererEnabled,
             settingsConfig.isActorDebugRendererEnabled(), value -> {
-                if (value == settingsConfig.isActorDebugRendererEnabled()) {
-                    return;
-                }
                 settingsConfig.setActorDebugRendererEnabled(value);
                 if (!value) {
                     proxy.getDebugShapeRenderer().clearShapes(
@@ -470,6 +467,9 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig.isActorDebugRendererShowText(),
             value -> {
                 settingsConfig.setActorDebugRendererShowText(value);
+                if (!settingsConfig.isActorDebugRendererEnabled()) {
+                    return;
+                }
                 if (!value) {
                     proxy.getDebugShapeRenderer().clearShapes(
                         shapeId -> shapeId.startsWith("actor_box_text_") ||
@@ -527,7 +527,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             final int cnsScreenMinPacketNum = Integer.parseInt(cnsScreenMinPacketNumRaw);
             if (cnsScreenMinPacketNum <= 0) {
                 proxy.getPlayer().sendMessage("§cInvalid number");
-                return;
             }
             if (settingsConfig.getCnsScreenMinPacketNum() != cnsScreenMinPacketNum) {
                 settingsConfig.setCnsScreenMinPacketNum(cnsScreenMinPacketNum);
@@ -535,7 +534,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             }
         } catch (NumberFormatException e) {
             proxy.getPlayer().sendMessage("§cInvalid number");
-            return;
         }
 
         final PlatformType platformType = PlatformType.from(platformTypeOrdinal);

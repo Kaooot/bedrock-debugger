@@ -1,5 +1,6 @@
 package dev.kaooot.debugger.network.handler;
 
+import dev.kaooot.debugger.level.block.CustomBlockPropertyTable;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -60,14 +61,26 @@ public class StartGameHandler implements PacketHandler<StartGamePacket> {
         }
 
         final List<NbtMap> list = new ObjectArrayList<>();
-
+        final CustomBlockPropertyTable table = new CustomBlockPropertyTable(proxy);
+        int customBlockStateCount = 0;
         for (final ServerBlockProperty blockProperty : packet.getBlockProperties()) {
-            list.add(NbtMap.builder()
-                .putString("name", blockProperty.getName())
-                .putCompound("properties", blockProperty.getProperties())
-                .build()
+            final List<NbtMap> permutations = table.resolvePermutations(
+                blockProperty.getName(),
+                blockProperty.getProperties()
+            );
+            customBlockStateCount += permutations.size();
+            proxy.getBlockPaletteManager().registerCustomBlockStates(permutations);
+            list.add(
+                NbtMap.builder()
+                    .putString("name", blockProperty.getName())
+                    .putCompound("properties", blockProperty.getProperties())
+                    .build()
             );
         }
+        proxy.getLogger().debug(
+            "Loaded {} custom block states from the server block properties list",
+            customBlockStateCount
+        );
 
         proxy.getPlayer().setServerBlockProperties(NbtMap.builder()
             .putList("properties", NbtType.COMPOUND, list)
@@ -95,6 +108,7 @@ public class StartGameHandler implements PacketHandler<StartGamePacket> {
                 )
             );
         }
+
         proxy.getServer().sendPacket(packet);
         return PacketSignal.HANDLED;
     }

@@ -6,10 +6,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cloudburstmc.nbt.NBTInputStream;
@@ -39,6 +41,9 @@ public class BlockPaletteManager {
     private final Int2ObjectMap<Block> blocks = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<Block> usedBlocksList = new Int2ObjectOpenHashMap<>();
 
+    @Getter
+    private final Set<String> knownCustomBlockIdentifiers = new ObjectOpenHashSet<>();
+
     public void setUsedBlocksList() {
         final boolean hashes = this.proxy.getPlayer().isBlockNetworkIdsAreHashes();
         for (final Int2ObjectMap.Entry<Block> entry : this.blocks.int2ObjectEntrySet()) {
@@ -54,10 +59,32 @@ public class BlockPaletteManager {
         }
     }
 
+    public void registerCustomBlockStates(List<NbtMap> permutations) {
+        for (final NbtMap permutation : permutations) {
+            final JsonObject jsonBlock = this.createJSONBlock(permutation);
+            this.mapping.put(permutation, jsonBlock);
+            this.knownCustomBlockIdentifiers.add(permutation.getString("name"));
+
+            final int blockRuntimeId = permutation.getInt("network_id");
+            this.usedBlocksList.put(
+                blockRuntimeId,
+                new Block(
+                    blockRuntimeId,
+                    permutation,
+                    true
+                )
+            );
+        }
+    }
+
     public Block getBlock(int blockRuntimeId) {
-        return this.usedBlocksList.getOrDefault(
+        return this.usedBlocksList.computeIfAbsent(
             blockRuntimeId,
-            new Block(blockRuntimeId, null, this.proxy.getPlayer().isBlockNetworkIdsAreHashes())
+            id -> new Block(
+                blockRuntimeId,
+                null,
+                this.proxy.getPlayer().isBlockNetworkIdsAreHashes()
+            )
         );
     }
 

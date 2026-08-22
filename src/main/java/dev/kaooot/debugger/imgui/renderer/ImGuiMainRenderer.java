@@ -1,9 +1,23 @@
 package dev.kaooot.debugger.imgui.renderer;
 
 import com.google.gson.JsonArray;
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.config.ConfigRegistry;
+import dev.kaooot.debugger.config.SettingsConfig;
+import dev.kaooot.debugger.core.registry.Registries;
+import dev.kaooot.debugger.core.registry.RegistryKey;
+import dev.kaooot.debugger.imgui.ImGuiAdapter;
+import dev.kaooot.debugger.level.LevelChunk;
+import dev.kaooot.debugger.level.block.Block;
+import dev.kaooot.debugger.network.NetworkConstants;
+import dev.kaooot.debugger.player.CheatClientAuthority;
+import dev.kaooot.debugger.player.ClientAuthoritativeSettings;
+import dev.kaooot.debugger.player.DebugMarkerSettings;
+import dev.kaooot.debugger.util.Util;
 import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.flag.ImGuiCol;
+import imgui.flag.ImGuiColorEditFlags;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiTableColumnFlags;
@@ -20,6 +34,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -38,18 +53,6 @@ import org.cloudburstmc.protocol.bedrock.packet.BedrockPacketType;
 import org.cloudburstmc.protocol.bedrock.packet.LevelEventPacket;
 import org.cloudburstmc.protocol.bedrock.packet.LevelSoundEventPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerFogPacket;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.config.ConfigRegistry;
-import dev.kaooot.debugger.config.SettingsConfig;
-import dev.kaooot.debugger.core.registry.Registries;
-import dev.kaooot.debugger.core.registry.RegistryKey;
-import dev.kaooot.debugger.imgui.ImGuiAdapter;
-import dev.kaooot.debugger.level.LevelChunk;
-import dev.kaooot.debugger.level.block.Block;
-import dev.kaooot.debugger.network.NetworkConstants;
-import dev.kaooot.debugger.player.CheatClientAuthority;
-import dev.kaooot.debugger.player.ClientAuthoritativeSettings;
-import dev.kaooot.debugger.util.Util;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -81,8 +84,13 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
     private final ImBoolean weatherDebugTabOpen = new ImBoolean(false);
     private final ImBoolean personaDebugTabOpen = new ImBoolean(false);
     private final ImBoolean antiCheatTestingTabOpen = new ImBoolean(false);
-    private final ImVec4 defaultColor = new ImVec4(0.26f, 0.59f, 0.98f, 0.4f);
-    private final ImVec4 blackColor = new ImVec4(0f, 0f, 0f, 1f);
+
+    private static final ImVec4 DEFAULT_COLOR = new ImVec4(0.26f, 0.59f, 0.98f, 0.4f);
+    private static final ImVec4 BLACK_COLOR = new ImVec4(0f, 0f, 0f, 1f);
+    private static final int DEFAULT_TEXT_COLOR = 0xFFFFFFFF;
+    private static final int DEFAULT_TEXT_BACKGROUND_COLOR = 0xFF4296FA;
+
+    private final ImString customBlockIdFilter = new ImString(100);
 
     @Override
     public void render(BedrockDebuggerProxy proxy, ImGuiAdapter adapter) {
@@ -104,6 +112,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
         }
         proxy.getImGuiAdapter().removeWindow("main");
         proxy.getImGuiAdapter().removeWindow("block");
+        proxy.getImGuiAdapter().removeWindow("custom_block_table");
         proxy.getImGuiAdapter().removeWindow("levelSoundEvent");
         proxy.getImGuiAdapter().removeWindow("ac");
         proxy.getImGuiAdapter().removeWindow("packet_list");
@@ -164,7 +173,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
     private void renderTab(ImBoolean opened, String name) {
         ImGui.pushStyleColor(
             ImGuiCol.Button,
-            opened.get() ? this.defaultColor : this.blackColor
+            opened.get() ? DEFAULT_COLOR : BLACK_COLOR
         );
         if (ImGui.button(name)) {
             opened.set(!opened.get());
@@ -173,6 +182,9 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
     }
 
     private void renderBlockDebug() {
+        if (this.proxy.isTransferring()) {
+            return;
+        }
         if (ImGui.begin("Block Debug",
             ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoCollapse)) {
             this.proxy.getImGuiAdapter().trackWindow("block");
@@ -196,6 +208,88 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             }
         }
         ImGui.end();
+        ImGui.setNextWindowSizeConstraints(0, 0, Float.MAX_VALUE, 400);
+        if (ImGui.begin("Custom Block Table", ImGuiWindowFlags.NoCollapse)) {
+            this.proxy.getImGuiAdapter().trackWindow("custom_block_table");
+
+            ImGui.inputText("Filter", this.customBlockIdFilter);
+
+            if (ImGui.beginTable("custom_block_table", 2,
+                ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
+                ImGui.tableSetupColumn("ID");
+                ImGui.tableSetupColumn("Render Settings");
+                ImGui.tableHeadersRow();
+
+                final Map<String, DebugMarkerSettings> ids =
+                    this.proxy.getPlayer().getCustomBlockRenderSettings();
+                for (final String identifier : this.proxy.getBlockPaletteManager()
+                    .getKnownCustomBlockIdentifiers()) {
+                    if (!this.customBlockIdFilter.isEmpty() &&
+                        !identifier.contains(this.customBlockIdFilter.get())) {
+                        continue;
+                    }
+                    ImGui.pushID(identifier);
+                    ImGui.tableNextRow();
+                    ImGui.tableSetColumnIndex(0);
+                    ImGui.text(identifier);
+                    ImGui.tableSetColumnIndex(1);
+                    final ImBoolean renderDebugMarker = new ImBoolean(
+                        this.proxy.getPlayer().getCustomBlockRenderSettings()
+                            .containsKey(identifier)
+                    );
+
+                    if (ImGui.checkbox("Render Debug Marker", renderDebugMarker)) {
+                        final boolean value = renderDebugMarker.get();
+                        if (value && !ids.containsKey(identifier)) {
+                            final DebugMarkerSettings settings = new DebugMarkerSettings();
+                            settings.setTextColor(DEFAULT_TEXT_COLOR);
+                            settings.setTextBackgroundColor(DEFAULT_TEXT_BACKGROUND_COLOR);
+
+                            ids.put(identifier, settings);
+
+                            this.updateAllChunksAsync();
+                        } else if (!value && ids.containsKey(identifier)) {
+                            ids.remove(identifier);
+                            this.proxy.getDebugShapeRenderer().clearShapes(
+                                s -> s.startsWith("debug_marker_" + identifier)
+                            );
+                        }
+                    }
+                    final boolean isPresent = ids.containsKey(identifier);
+                    if (isPresent) {
+                        final DebugMarkerSettings settings = ids.get(identifier);
+                        float[] textColorComponents = Util.toFloats(settings.getTextColor());
+                        if (ImGui.colorEdit4("Text Color", textColorComponents,
+                            ImGuiColorEditFlags.NoInputs)) {
+                            settings.setTextColor(Util.fromFloats(textColorComponents));
+                        }
+
+                        float[] textBgColorComponents = Util.toFloats(
+                            settings.getTextBackgroundColor()
+                        );
+                        if (ImGui.colorEdit4("Background Color", textBgColorComponents,
+                            ImGuiColorEditFlags.NoInputs)) {
+                            settings.setTextBackgroundColor(Util.fromFloats(textBgColorComponents));
+                        }
+                        if (ImGui.button("Update Colors")) {
+                            this.updateAllChunksAsync();
+                        }
+                    }
+                    ImGui.popID();
+                }
+                ImGui.endTable();
+            }
+        }
+        ImGui.end();
+    }
+
+    private void updateAllChunksAsync() {
+        CompletableFuture.runAsync(() -> {
+            for (final LevelChunk chunk : this.proxy.getPlayer().getPlayerChunkManager()
+                .getChunks().values()) {
+                this.proxy.getPlayer().updateCustomBlockDebugMarkers(chunk);
+            }
+        });
     }
 
     private void renderLevelSoundEventDebug() {
@@ -210,7 +304,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                 SOUND_EVENT_DEBUG_LOCKED = !SOUND_EVENT_DEBUG_LOCKED;
             }
 
-            if (ImGui.beginTable("Level Sound Events", 2,
+            if (ImGui.beginTable("level_sound_event_table", 2,
                 ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
                 ImGui.tableSetupColumn("Sound Event");
                 ImGui.tableSetupColumn("Position");
@@ -302,7 +396,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
 
             ImGui.inputText("Filter", this.filter);
 
-            if (ImGui.beginTable("Packets", 3,
+            if (ImGui.beginTable("packet_list_table", 3,
                 ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
                 ImGui.tableSetupColumn("Recipient", ImGuiTableColumnFlags.WidthFixed, 70.0f);
                 ImGui.tableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 50.0f);
@@ -518,7 +612,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             final SerializedSkin serializedSkin = this.proxy.getPlayer().getSerializedSkin();
             if (serializedSkin.isPersona()) {
                 ImGui.text("Persona Pieces");
-                if (ImGui.beginTable("Persona Pieces", 2,
+                if (ImGui.beginTable("persona_pieces_table", 2,
                     ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg)) {
                     ImGui.tableSetupColumn("Piece Id");
                     ImGui.tableSetupColumn("Piece Type");
