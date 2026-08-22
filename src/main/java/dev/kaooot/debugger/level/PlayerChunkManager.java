@@ -1,28 +1,27 @@
 package dev.kaooot.debugger.level;
 
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.level.block.Block;
+import dev.kaooot.debugger.level.storage.SubChunkStorage;
+import dev.kaooot.debugger.player.ProxiedPlayer;
+import dev.kaooot.debugger.util.Util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Iterator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cloudburstmc.math.vector.Vector3i;
 import org.cloudburstmc.nbt.NBTInputStream;
 import org.cloudburstmc.nbt.NbtMap;
-import org.cloudburstmc.nbt.NbtType;
 import org.cloudburstmc.nbt.NbtUtils;
 import org.cloudburstmc.protocol.bedrock.data.BlockChangeEntry;
 import org.cloudburstmc.protocol.bedrock.data.definitions.BlockDefinition;
 import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
 import org.cloudburstmc.protocol.bedrock.packet.BlockActorDataPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateSubChunkBlocksPacket;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.level.block.Block;
-import dev.kaooot.debugger.level.storage.SubChunkStorage;
-import dev.kaooot.debugger.player.ProxiedPlayer;
-import dev.kaooot.debugger.util.Util;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -135,6 +134,20 @@ public class PlayerChunkManager {
 
     public void clearChunks() {
         this.chunks.clear();
+    }
+
+    public void evictChunksOutsideRadius(int centerChunkX, int centerChunkZ, int radiusChunks) {
+        final Iterator<LevelChunk> iterator = this.chunks.values().iterator();
+        while (iterator.hasNext()) {
+            final LevelChunk chunk = iterator.next();
+            final int distance = Math.max(
+                Math.abs(chunk.getX() - centerChunkX),
+                Math.abs(chunk.getZ() - centerChunkZ)
+            );
+            if (distance > radiusChunks) {
+                iterator.remove();
+            }
+        }
     }
 
     public void readSubChunk(ByteBuf serializedChunkData, int subChunkIndex, int chunkX, int chunkZ,

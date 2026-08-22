@@ -32,6 +32,7 @@ public class TransferHandler implements PacketHandler<TransferPacket> {
         proxy.getServer().sendPacket(packet);
         proxy.getPlayers().clear();
         proxy.getActors().clear();
+        proxy.getPlayer().getPlayerChunkManager().clearChunks();
         return PacketSignal.HANDLED;
     }
 }

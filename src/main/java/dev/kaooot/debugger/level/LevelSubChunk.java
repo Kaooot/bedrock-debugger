@@ -44,11 +44,7 @@ public class LevelSubChunk {
     }
 
     public void setBlock(int x, int y, int z, int layer, Block block) {
-        try {
-            this.storages[layer].set(Util.indexOf(x, y, z), block);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.storages[layer].set(Util.indexOf(x, y, z), block);
     }
 
     public Block getBlock(int x, int y, int z, int layer) {

@@ -145,6 +145,10 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                 if (ImGui.button("Force Reload")) {
                     this.proxy.getImGuiAdapter().reinit();
                 }
+                ImGui.text(
+                    "Internal Chunk Count: " + this.proxy.getPlayer().getPlayerChunkManager()
+                        .getChunks().size()
+                );
             }
             if (this.blockDebugTabOpen.get()) {
                 this.renderBlockDebug();
