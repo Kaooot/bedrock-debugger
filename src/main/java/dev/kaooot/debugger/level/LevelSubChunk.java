@@ -48,8 +48,6 @@ public class LevelSubChunk {
             this.storages[layer].set(Util.indexOf(x, y, z), block);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("layer: " + layer);
-            System.out.println(Arrays.toString(this.storages));
         }
     }
 
