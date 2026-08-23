@@ -136,15 +136,15 @@ public class PlayerChunkManager {
         this.chunks.clear();
     }
 
-    public void evictChunksOutsideRadius(int centerChunkX, int centerChunkZ, int radiusChunks) {
+    public void evictChunksOutsideRadius(int x, int z, int viewDistance) {
         final Iterator<LevelChunk> iterator = this.chunks.values().iterator();
         while (iterator.hasNext()) {
             final LevelChunk chunk = iterator.next();
             final int distance = Math.max(
-                Math.abs(chunk.getX() - centerChunkX),
-                Math.abs(chunk.getZ() - centerChunkZ)
+                Math.abs(chunk.getX() - x),
+                Math.abs(chunk.getZ() - z)
             );
-            if (distance > radiusChunks) {
+            if (distance > viewDistance) {
                 iterator.remove();
             }
         }

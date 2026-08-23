@@ -52,7 +52,8 @@ public class BlockPaletteManager {
             }
         }
         for (final Block value : this.usedBlocksList.values()) {
-            if (value.getState().getString("name").equalsIgnoreCase("minecraft:air")) {
+            if (value.getState() != null &&
+                value.getState().getString("name").equalsIgnoreCase("minecraft:air")) {
                 Block.AIR = value;
                 break;
             }
