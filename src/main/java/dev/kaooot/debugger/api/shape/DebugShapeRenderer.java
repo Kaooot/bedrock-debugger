@@ -1,5 +1,6 @@
 package dev.kaooot.debugger.api.shape;
 
+import dev.kaooot.debugger.server.ProxiedServer;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.cloudburstmc.protocol.bedrock.data.payload.shape.PrimitiveShapeDataPayload;
 import org.cloudburstmc.protocol.bedrock.packet.PrimitiveShapesPacket;
 import org.cloudburstmc.protocol.common.util.Preconditions;
-import dev.kaooot.debugger.server.ProxiedServer;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -202,6 +202,21 @@ public class DebugShapeRenderer {
         // race condition fix
         this.server.getEventLoop()
             .schedule(() -> this.sendPacket(shapes), 50, TimeUnit.MILLISECONDS);
+    }
+
+    public int getShapesCount() {
+        return this.shapes.size();
+    }
+
+    public void removeShapesFromChunk(int x, int z) {
+        final List<String> shapeIds = this.shapes.stream()
+            .filter(
+                debugShape -> debugShape.getLocation().getFloorX() >> 4 == x &&
+                    debugShape.getLocation().getFloorZ() >> 4 == z
+            )
+            .map(DebugShape::getId)
+            .toList();
+        this.clearShapes(shapeIds::contains);
     }
 
     public void removeShapes(String... ids) {

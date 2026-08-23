@@ -133,6 +133,9 @@ public class PlayerChunkManager {
     }
 
     public void clearChunks() {
+        for (final LevelChunk chunk : this.chunks.values()) {
+            this.proxy.getDebugShapeRenderer().removeShapesFromChunk(chunk.getX(), chunk.getZ());
+        }
         this.chunks.clear();
     }
 
@@ -145,6 +148,8 @@ public class PlayerChunkManager {
                 Math.abs(chunk.getZ() - z)
             );
             if (distance > viewDistance) {
+                this.proxy.getDebugShapeRenderer()
+                    .removeShapesFromChunk(chunk.getX(), chunk.getZ());
                 iterator.remove();
             }
         }

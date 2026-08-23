@@ -149,6 +149,10 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                     "Internal Chunk Count: " + this.proxy.getPlayer().getPlayerChunkManager()
                         .getChunks().size()
                 );
+                ImGui.text(
+                    "Internal Primitive Shapes Count: " + this.proxy.getDebugShapeRenderer()
+                        .getShapesCount()
+                );
             }
             if (this.blockDebugTabOpen.get()) {
                 this.renderBlockDebug();
