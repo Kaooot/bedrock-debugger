@@ -160,6 +160,7 @@ public class BedrockDebuggerProxy {
         this.debugShapeRenderer = new DebugShapeRenderer(this.server);
         this.shutdownIfDisconnected();
         this.debugHttpServer.stop();
+        this.imGuiAdapter.stop();
         System.exit(0);
     }
 

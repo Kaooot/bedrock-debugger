@@ -643,7 +643,7 @@ public class ProxiedPlayer {
                 final DebugText text = new DebugText();
                 text.setId(textId);
                 text.setText(id.split(":")[1]);
-                text.setLocation(Vector3f.from(blockX, blockY + 1, blockZ));
+                text.setLocation(Vector3f.from(blockX + 0.5f, blockY + 1, blockZ + 0.5f));
                 text.setDimension(this.proxy.getPlayer().getDimension());
                 text.setColor(settings.getTextColor());
                 text.setBackgroundColor(settings.getTextBackgroundColor());

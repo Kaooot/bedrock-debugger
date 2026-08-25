@@ -3,6 +3,10 @@ package dev.kaooot.debugger.imgui;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.core.registry.Registries;
+import dev.kaooot.debugger.core.registry.RegistryKey;
+import dev.kaooot.debugger.imgui.renderer.ImGuiRenderer;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImVec2;
@@ -12,17 +16,15 @@ import imgui.glfw.ImGuiImplGlfw;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.nio.DoubleBuffer;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.core.registry.Registries;
-import dev.kaooot.debugger.core.registry.RegistryKey;
-import dev.kaooot.debugger.imgui.renderer.ImGuiRenderer;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -68,10 +70,23 @@ public class ImGuiAdapter {
         this.renderThread.whenComplete((unused, throwable) -> this.init());
     }
 
+    public void stop() {
+        if (!this.initialized || this.renderThread == null) {
+            return;
+        }
+        GLFW.glfwSetWindowShouldClose(this.mainWindowHandle, true);
+        try {
+            this.renderThread.join();
+        } catch (CompletionException | CancellationException e) {
+            this.proxy.getLogger().error("Failed to stop ImGui render thread", e);
+        }
+    }
+
     public void shutdown() {
         if (!this.initialized) {
             return;
         }
+        this.initialized = false;
         this.imGuiImplGl3.shutdown();
         this.imGuiImplGlfw.shutdown();
 
