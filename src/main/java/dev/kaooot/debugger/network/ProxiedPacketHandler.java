@@ -19,13 +19,13 @@ import org.cloudburstmc.protocol.common.PacketSignal;
 public class ProxiedPacketHandler implements BedrockPacketHandler {
 
     private final BedrockDebuggerProxy proxy;
-    private final boolean isServer;
+    private final boolean isServerRecipient;
     private final ClientNetworkStatsScreen screen;
     private final ImGuiMainRenderer imGuiMainRenderer;
 
-    public ProxiedPacketHandler(BedrockDebuggerProxy proxy, boolean isServer) {
+    public ProxiedPacketHandler(BedrockDebuggerProxy proxy, boolean isServerRecipient) {
         this.proxy = proxy;
-        this.isServer = isServer;
+        this.isServerRecipient = isServerRecipient;
         final DebugScreenRegistry debugScreenRegistry =
             Registries.getRegistry(RegistryKey.DEBUG_SCREEN);
         final ImGuiRendererRegistry imGuiRendererRegistry =
@@ -38,7 +38,7 @@ public class ProxiedPacketHandler implements BedrockPacketHandler {
 
     @Override
     public PacketSignal handlePacket(BedrockPacket packet) {
-        this.screen.increasePacketCounter(packet, this.isServer);
+        this.screen.increasePacketCounter(packet, this.isServerRecipient);
         this.imGuiMainRenderer.logPacket(packet);
         final PacketHandler handler;
         if ((handler = Registries.<PacketHandlerRegistry>getRegistry(RegistryKey.PACKET_HANDLER)

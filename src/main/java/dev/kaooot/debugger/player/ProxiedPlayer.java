@@ -449,7 +449,8 @@ public class ProxiedPlayer {
                 data.getMinHeight(),
                 GeneratorType.UNDEFINED,
                 dimension,
-                null
+                new UUID(0L, 0L),
+                "minecraft:ocean"
             );
         }
         return target;
