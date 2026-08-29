@@ -293,6 +293,15 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig.getSubChunkDebugRendererColorB()
         );
 
+        final Toggle packetLogToggle = new Toggle();
+        packetLogToggle.setId("toggle-packet_log");
+        packetLogToggle.setText("Packet Log Enabled");
+        packetLogToggle.setDefaultValue(settingsConfig.isPacketLogEnabled());
+        packetLogToggle.setTooltip(
+            "Whether observed packets are captured in the Packet Log (ImGui overlay) and, when " +
+                "enabled there, written to file. Defaults to true."
+        );
+
         final Input cnsScreenMinPacketNumInput = new Input();
         cnsScreenMinPacketNumInput.setId("input-cns_screen_min_packet_num");
         cnsScreenMinPacketNumInput.setText("CNS Screen Min Packet Num");
@@ -313,6 +322,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 generalSectionLabel,
                 commandsToggle, renderBuildInfoToggle, renderExperimentInfoToggle,
                 spoofDeviceIDToggle,
+                packetLogToggle,
                 cnsScreenMinPacketNumInput,
                 platformTypeSlider,
                 zoneIdOverrideInput,
@@ -399,6 +409,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         final boolean spoofDeviceIdToggle = response.getToggleResponse(
             "toggle-spoof_device_id"
         );
+        final boolean packetLog = response.getToggleResponse("toggle-packet_log");
         final boolean forceDisableServerAuthBlockBreaking = response.getToggleResponse(
             "toggle-force_disable_server_auth_block_breaking"
         );
@@ -478,6 +489,8 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig::setPlayerDebugRendererColorG,
             settingsConfig::setPlayerDebugRendererColorB
         );
+        this.updateToggle(packetLog, settingsConfig.isPacketLogEnabled(),
+            settingsConfig::setPacketLogEnabled, proxy, "Packet Log");
         this.updateToggle(renderBuildInfo, settingsConfig.isRenderBuildInfo(),
             settingsConfig::setRenderBuildInfo, proxy, "Build Info Rendering");
         this.updateToggle(renderExperimentInfo, settingsConfig.isRenderExperimentInfo(),

@@ -19,8 +19,6 @@ import dev.kaooot.debugger.api.shape.DebugText;
 import dev.kaooot.debugger.menu.ServerSettingsMenu;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import org.cloudburstmc.math.vector.Vector2f;
 import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorDataTypes;
@@ -30,7 +28,6 @@ import org.cloudburstmc.protocol.bedrock.data.map.MapPixel;
 import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
 import org.cloudburstmc.protocol.bedrock.packet.MapInfoRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.SetActorDataPacket;
-import org.cloudburstmc.protocol.bedrock.packet.SpawnParticleEffectPacket;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -62,28 +59,6 @@ public class TestCommand extends Command<BedrockDebuggerProxy> {
             switch (args[0]) {
                 case "settings" -> new ServerSettingsMenu().show(proxy);
                 case "imgui" -> proxy.getImGuiAdapter().toggle();
-                case "particle" -> {
-                    final ThreadLocalRandom random = ThreadLocalRandom.current();
-                    proxy.getScheduler().schedule(() -> {
-                        for (int i = 0; i < 10; i++) {
-                            final SpawnParticleEffectPacket packet =
-                                new SpawnParticleEffectPacket();
-                            packet.setDimensionId(proxy.getPlayer().getDimension());
-                            packet.setActorId(proxy.getPlayer().getActorId());
-                            packet.setPosition(
-                                Vector3f.from(
-                                    random.nextFloat(-2f, 2f),
-                                    random.nextFloat(2f, 2.5f),
-                                    random.nextFloat(-2f, 2f)
-                                )
-                            );
-                            packet.setEffectName("minecraft:snowflake_particle");
-                            packet.setMolangVariables(Optional.empty());
-
-                            proxy.getServer().sendPacket(packet);
-                        }
-                    }, 100);
-                }
                 case "bad_packet" -> {
                     final MapInfoRequestPacket packet = new MapInfoRequestPacket();
                     packet.setMapUniqueID(0L);

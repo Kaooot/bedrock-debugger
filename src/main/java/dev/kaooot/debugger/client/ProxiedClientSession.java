@@ -29,6 +29,8 @@ public class ProxiedClientSession extends BedrockClientSession {
     protected void onPacket(BedrockPacketWrapper wrapper) {
         final BedrockPacket packet = wrapper.getPacket();
 
+        this.proxy.getPacketLog().capture(wrapper, PacketRecipient.CLIENT);
+
         if (this.packetHandler == null) {
             this.proxy.getLogger().warn("Received packet without handler for {}:{}",
                 this.peer.getSocketAddress(), this.subClientId);
