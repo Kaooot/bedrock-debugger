@@ -19,7 +19,6 @@ import imgui.type.ImInt;
 import imgui.type.ImString;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -64,6 +63,7 @@ public class PacketLog {
     private final Object entriesLock = new Object();
     private final ArrayDeque<PacketLogEntry> entries = new ArrayDeque<>();
     private final AtomicLong sequence = new AtomicLong();
+    private long changeCounter;
 
     private final Object fileLock = new Object();
     private Writer fileWriter;
@@ -74,14 +74,18 @@ public class PacketLog {
     private final ImString filter = new ImString(100);
     private final ImBoolean paused = new ImBoolean(false);
     private final ImBoolean logToFile = new ImBoolean(false);
+    private final ImBoolean captureToString = new ImBoolean(false);
     private final ImInt viewMode = new ImInt(VIEW_HEX);
     private final ImBoolean autoScroll = new ImBoolean(true);
     private long selectedSequence = -1L;
     private final List<PacketLogEntry> renderSnapshot = new ArrayList<>();
     private final List<PacketLogEntry> filtered = new ArrayList<>();
+    private long snapshotChangeCounter = -1L;
+    private String snapshotFilter;
 
     public PacketLog(BedrockDebuggerProxy proxy) {
         this.proxy = proxy;
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stopFileLogging));
     }
 
     private boolean isLoggingEnabled() {
@@ -135,11 +139,13 @@ public class PacketLog {
         } catch (Exception ignored) {
         }
 
-        String packetString;
-        try {
-            packetString = packet.toString();
-        } catch (Exception e) {
-            packetString = "<toString failed: " + e + ">";
+        String packetString = null;
+        if (this.logToFile.get() || this.captureToString.get()) {
+            try {
+                packetString = packet.toString();
+            } catch (Exception e) {
+                packetString = "<toString failed: " + e + ">";
+            }
         }
 
         final PacketLogEntry entry = new PacketLogEntry(
@@ -158,6 +164,7 @@ public class PacketLog {
             while (this.entries.size() > MAX_ENTRIES) {
                 this.entries.removeFirst();
             }
+            this.changeCounter++;
         }
         this.writeToFile(entry);
     }
@@ -177,12 +184,13 @@ public class PacketLog {
                     entry.getName(),
                     entry.size()
                 ));
-                this.fileWriter.write(entry.getPacketString());
-                this.fileWriter.write(System.lineSeparator());
+                if (entry.getPacketString() != null) {
+                    this.fileWriter.write(entry.getPacketString());
+                    this.fileWriter.write(System.lineSeparator());
+                }
                 this.fileWriter.write(entry.getHexDump());
                 this.fileWriter.write(System.lineSeparator());
                 this.fileWriter.write(System.lineSeparator());
-                this.fileWriter.flush();
             } catch (IOException e) {
                 this.proxy.getLogger().error("Failed to write packet to log file", e);
             }
@@ -200,9 +208,7 @@ public class PacketLog {
                 FILE_NAME_FORMAT.format(Instant.now()) + ".log";
             final File file = new File(folder, name);
             try {
-                this.fileWriter = new BufferedWriter(
-                    Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)
-                );
+                this.fileWriter = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
                 this.fileName = file.getPath();
                 this.proxy.getLogger().info("Started logging packets to {}", this.fileName);
             } catch (IOException e) {
@@ -234,6 +240,7 @@ public class PacketLog {
     public void clear() {
         synchronized (this.entriesLock) {
             this.entries.clear();
+            this.changeCounter++;
         }
         this.selectedSequence = -1L;
     }
@@ -268,6 +275,8 @@ public class PacketLog {
                 this.stopFileLogging();
             }
         }
+        ImGui.sameLine();
+        ImGui.checkbox("Capture toString", this.captureToString);
 
         final int count;
         synchronized (this.entriesLock) {
@@ -399,7 +408,9 @@ public class PacketLog {
     private String viewContent(PacketLogEntry entry) {
         return switch (this.viewMode.get()) {
             case VIEW_BINARY -> entry.getBinaryDump();
-            case VIEW_STRING -> entry.getPacketString();
+            case VIEW_STRING -> entry.getPacketString() == null
+                ? "toString not captured - enable \"Capture toString\" or \"Log to file\""
+                : entry.getPacketString();
             default -> entry.getHexDump();
         };
     }
@@ -417,12 +428,19 @@ public class PacketLog {
     }
 
     private void snapshotAndFilter() {
-        this.renderSnapshot.clear();
+        final String needle = this.filter.get().toLowerCase();
+        final long currentChange;
         synchronized (this.entriesLock) {
+            currentChange = this.changeCounter;
+            if (currentChange == this.snapshotChangeCounter && needle.equals(this.snapshotFilter)) {
+                return;
+            }
+            this.renderSnapshot.clear();
             this.renderSnapshot.addAll(this.entries);
         }
+        this.snapshotChangeCounter = currentChange;
+        this.snapshotFilter = needle;
         this.filtered.clear();
-        final String needle = this.filter.get().toLowerCase();
         if (needle.isEmpty()) {
             this.filtered.addAll(this.renderSnapshot);
         } else {

@@ -34,6 +34,7 @@ import org.lwjgl.opengl.GL11;
 @RequiredArgsConstructor
 public class ImGuiAdapter {
 
+    private static final long IDLE_FRAME_SLEEP_MS = 66L;
     private static final String WINDOW_TITLE = "Bedrock Debugger Overlay";
     private static final String RELEASE_TITLE = "Minecraft";
     private static final String PREVIEW_TITLE = "Minecraft Preview";
@@ -152,6 +153,7 @@ public class ImGuiAdapter {
         );
         GLFW.glfwSetWindowPos(this.mainWindowHandle, rect.left, rect.top);
         GLFW.glfwMakeContextCurrent(this.mainWindowHandle);
+        GLFW.glfwSwapInterval(1);
 
         GL.createCapabilities();
         GL11.glClearColor(.0f, .0f, .0f, .0f);
@@ -182,6 +184,14 @@ public class ImGuiAdapter {
 
             GLFW.glfwSwapBuffers(this.mainWindowHandle);
             GLFW.glfwPollEvents();
+
+            if (!this.mainRenderingToggle) {
+                try {
+                    Thread.sleep(IDLE_FRAME_SLEEP_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
     }
 

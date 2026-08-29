@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import lombok.Value;
+import org.cloudburstmc.protocol.bedrock.codec.BedrockPacketDefinition;
 import org.cloudburstmc.protocol.bedrock.packet.BedrockPacket;
 import org.cloudburstmc.protocol.bedrock.packet.BedrockPacketType;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
@@ -46,10 +47,12 @@ public class ClientNetworkStatsScreen implements DebugScreen {
     }
 
     public void increasePacketCounter(BedrockPacket packet, boolean fromClient) {
+        final BedrockPacketDefinition<?> definition =
+            NetworkConstants.CODEC.getPacketDefinition(packet.getClass());
         final NetworkPacketInfo info = new NetworkPacketInfo(
             packet.getClass().getSimpleName(),
             packet.getPacketType(),
-            NetworkConstants.CODEC.getPacketDefinition(packet.getClass()).getId(),
+            definition == null ? -1 : definition.getId(),
             fromClient
         );
         this.map.put(info, this.map.getOrDefault(info, 0) + 1);
