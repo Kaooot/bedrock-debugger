@@ -70,12 +70,7 @@ public class DebugScreenInfo {
                 this.selectedIndex == -1 ? 0 : this.selectedIndex
         );
         if (selectedIndex <= 0) {
-            final SettingsConfig settingsConfig = Registries.
-                <ConfigRegistry>getRegistry(RegistryKey.CONFIG)
-                .get(SettingsConfig.class);
-            if (settingsConfig.isEnableExperimentalImGui()) {
-                this.proxy.getImGuiAdapter().toggle();
-            }
+            this.proxy.getImGuiAdapter().toggle();
         }
         this.proxy.getServer().sendDebugInfos(
             previous.getElement(),

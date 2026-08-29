@@ -97,16 +97,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 "rendered when disabled. Defaults to true."
         );
 
-        final Toggle enableExperimentalImGuiToggle = new Toggle();
-        enableExperimentalImGuiToggle.setId("toggle-enable_experimental_imgui");
-        enableExperimentalImGuiToggle.setText(
-            "Enable Experimental ImGui Renderer (requires restart)"
-        );
-        enableExperimentalImGuiToggle.setDefaultValue(settingsConfig.isEnableExperimentalImGui());
-        enableExperimentalImGuiToggle.setTooltip(
-            "Enables the Experimental ImGui Renderer. Defaults to false."
-        );
-
         final Toggle forceDisableServerAuthBlockBreakingToggle = new Toggle();
         forceDisableServerAuthBlockBreakingToggle.setId(
             "toggle-force_disable_server_auth_block_breaking"
@@ -318,7 +308,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 header,
                 staticLabel,
                 blobCacheToggle, printDebugInfoToggle, packsToggle,
-                enableExperimentalImGuiToggle,
                 forceDisableServerAuthBlockBreakingToggle,
                 divider,
                 generalSectionLabel,
@@ -406,9 +395,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         );
         final String cnsScreenMinPacketNumRaw = response.getInputResponse(
             "input-cns_screen_min_packet_num"
-        );
-        final boolean enableExperimentalImGuiToggle = response.getToggleResponse(
-            "toggle-enable_experimental_imgui"
         );
         final boolean spoofDeviceIdToggle = response.getToggleResponse(
             "toggle-spoof_device_id"
@@ -558,14 +544,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             proxy.getPlayer().sendMessage("§cInvalid Zone ID");
             return;
         }
-
-        this.updateToggle(
-            enableExperimentalImGuiToggle,
-            settingsConfig.isEnableExperimentalImGui(),
-            settingsConfig::setEnableExperimentalImGui,
-            proxy,
-            "Experimental ImGui Renderer"
-        );
 
         this.updateToggle(
             spoofDeviceIdToggle,

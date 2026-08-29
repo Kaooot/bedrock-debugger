@@ -61,8 +61,6 @@ public class SettingsConfig extends Config {
     private int subChunkDebugRendererColorB = 85;
     @SerializedName("cns_screen_min_packet_num")
     private int cnsScreenMinPacketNum = 1;
-    @SerializedName("enable_experimental_imgui")
-    private boolean enableExperimentalImGui;
     @SerializedName("override_client_network_version")
     private boolean overrideClientNetworkVersion;
     @SerializedName("should_spoof_device_id")
