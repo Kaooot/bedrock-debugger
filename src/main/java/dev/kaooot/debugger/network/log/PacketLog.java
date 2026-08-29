@@ -133,7 +133,6 @@ public class PacketLog {
                 packetId = definition.getId();
             }
         } catch (Exception ignored) {
-            // unknown packet type
         }
 
         String packetString;

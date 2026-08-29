@@ -32,7 +32,7 @@ import dev.kaooot.debugger.util.BlockPaletteManager;
 import dev.kaooot.debugger.util.DebugHttpServer;
 import dev.kaooot.debugger.util.DebugScreenInfo;
 import dev.kaooot.debugger.util.RuntimeBlockDefinitionRegistry;
-import dev.kaooot.debugger.util.protocoldocs.ProtocolDocsGenerator;
+import dev.kaooot.debugger.util.protocoldocs.ProtocolDocsParser;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.net.InetSocketAddress;
@@ -93,7 +93,7 @@ public class BedrockDebuggerProxy {
 
     private final DebugHttpServer debugHttpServer;
     private final BlockPaletteGenerator blockPaletteGenerator;
-    private final ProtocolDocsGenerator protocolDocsGenerator;
+    private final ProtocolDocsParser protocolDocsParser;
 
     public BedrockDebuggerProxy() {
         System.setProperty("bedrock.maxDecompressedBytes", String.valueOf(Integer.MAX_VALUE));
@@ -148,7 +148,7 @@ public class BedrockDebuggerProxy {
         this.debugHttpServer.start();
 
         this.blockPaletteGenerator = new BlockPaletteGenerator(this);
-        this.protocolDocsGenerator = new ProtocolDocsGenerator();
+        this.protocolDocsParser = new ProtocolDocsParser();
 
         this.connect(config);
         this.server = new ProxiedServer(new InetSocketAddress(config.getProxyAddress(),

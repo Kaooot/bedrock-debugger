@@ -29,14 +29,14 @@ public class BedrockMap extends BedrockProperty {
 
     @Override
     public Node toNode(AtomicInteger id, String label, boolean optional,
-                       Map<Long, BedrockType> definitions, List<Integer> lastOnes,
+                       Map<String, BedrockType> definitions, List<Integer> lastOnes,
                        Attributes<? extends ForNode> style) {
         return this.additionalProperties.toNode(id, label, optional, definitions, lastOnes, style);
     }
 
     @Override
     public Node toNode(AtomicInteger id, String label, boolean optional,
-                       Map<Long, BedrockType> definitions, List<Integer> lastOnes) {
+                       Map<String, BedrockType> definitions, List<Integer> lastOnes) {
         return this.additionalProperties.toNode(id, label, optional, definitions, lastOnes);
     }
 }
