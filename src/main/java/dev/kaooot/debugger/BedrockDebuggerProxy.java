@@ -51,6 +51,8 @@ import org.cloudburstmc.protocol.common.util.Preconditions;
 @Getter
 public class BedrockDebuggerProxy {
 
+    private static final int CONFIG_RELOAD_PERIOD_TICKS = 600;
+
     private final Logger logger = new MainLogger();
     private final MsaAuth msaAuth;
     private final Gson gson = new GsonBuilder()
@@ -139,6 +141,8 @@ public class BedrockDebuggerProxy {
 
         this.keyInputListener = new KeyInputListener(this);
         this.keyInputListener.init();
+
+        this.scheduler.schedule(configRegistry::reloadAll, CONFIG_RELOAD_PERIOD_TICKS);
 
         this.authServiceConnection = new AuthServiceConnection(this);
         this.gatheringServiceConnection = new GatheringServiceConnection(this);

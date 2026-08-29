@@ -1,7 +1,6 @@
 package dev.kaooot.debugger.api.scheduler;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -13,30 +12,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class Task {
 
-    private final Runnable runnable;
-    private final int period;
-    private final int delay;
-    private final Timer timer = new Timer();
-
-    public void start() {
-        if(this.period == 0){
-            this.timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Task.this.runnable.run();
-                }
-            }, this.delay * 50L);
-        } else {
-            this.timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Task.this.runnable.run();
-                }
-            }, this.delay * 50L, this.period * 50L);
-        }
-    }
+    private final ScheduledFuture<?> future;
 
     public void cancel() {
-        this.timer.cancel();
+        this.future.cancel(false);
+    }
+
+    public boolean isCancelled() {
+        return this.future.isCancelled();
     }
 }
