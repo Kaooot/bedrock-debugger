@@ -1,6 +1,5 @@
 package dev.kaooot.debugger.imgui.renderer;
 
-import com.google.gson.JsonArray;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.config.ConfigRegistry;
 import dev.kaooot.debugger.config.SettingsConfig;
@@ -27,27 +26,15 @@ import imgui.type.ImBoolean;
 import imgui.type.ImFloat;
 import imgui.type.ImInt;
 import imgui.type.ImString;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.cloudburstmc.math.vector.Vector2f;
-import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.math.vector.Vector3i;
-import org.cloudburstmc.protocol.bedrock.data.LevelEvent;
 import org.cloudburstmc.protocol.bedrock.data.payload.skin.PieceType;
 import org.cloudburstmc.protocol.bedrock.data.payload.skin.SerializedPersonaPieceHandle;
 import org.cloudburstmc.protocol.bedrock.data.payload.skin.SerializedSkin;
 import org.cloudburstmc.protocol.bedrock.data.payload.skin.TintMapColor;
-import org.cloudburstmc.protocol.bedrock.packet.AddActorPacket;
-import org.cloudburstmc.protocol.bedrock.packet.LevelEventPacket;
-import org.cloudburstmc.protocol.bedrock.packet.PlayerFogPacket;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -58,17 +45,9 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
 
     private BedrockDebuggerProxy proxy;
 
-    private WeatherType selectedWeatherType = WeatherType.NONE;
-    private ThunderstormIntensity selectedThunderstormIntensity = ThunderstormIntensity.NORMAL;
-    private long thunderstormTick;
-    private int selectedFogIndex = -1;
-
-    private String[] fogIds;
-
     private final ImBoolean imGuiTabOpen = new ImBoolean(false);
     private final ImBoolean blockDebugTabOpen = new ImBoolean(false);
     private final ImBoolean packetLogTabOpen = new ImBoolean(false);
-    private final ImBoolean weatherDebugTabOpen = new ImBoolean(false);
     private final ImBoolean personaDebugTabOpen = new ImBoolean(false);
     private final ImBoolean antiCheatTestingTabOpen = new ImBoolean(false);
 
@@ -87,28 +66,12 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
         this.proxy = proxy;
         final ConfigRegistry configRegistry = Registries.getRegistry(RegistryKey.CONFIG);
         final SettingsConfig settingsConfig = configRegistry.get(SettingsConfig.class);
-        if (this.fogIds == null) {
-            try (final InputStream inputStream = proxy.getClass().getClassLoader()
-                .getResourceAsStream("fog_identifiers.json")) {
-                final JsonArray array = this.proxy.getGson()
-                    .fromJson(new String(inputStream.readAllBytes()), JsonArray.class);
-                this.fogIds = new String[array.size()];
-                for (int i = 0; i < array.size(); i++) {
-                    this.fogIds[i] = array.get(i).getAsString();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         proxy.getImGuiAdapter().removeWindow("main");
         proxy.getImGuiAdapter().removeWindow("block");
         proxy.getImGuiAdapter().removeWindow("custom_block_table");
-        proxy.getImGuiAdapter().removeWindow("levelSoundEvent");
         proxy.getImGuiAdapter().removeWindow("ac");
         proxy.getImGuiAdapter().removeWindow("packet_log");
-        proxy.getImGuiAdapter().removeWindow("weather");
         proxy.getImGuiAdapter().removeWindow("persona");
-        proxy.getImGuiAdapter().removeWindow("debug1");
 
         ImGui.setNextWindowBgAlpha(1.0f);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
@@ -121,8 +84,6 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             this.renderTab(this.blockDebugTabOpen, "Block Debug");
             ImGui.sameLine();
             this.renderTab(this.packetLogTabOpen, "Packet Log");
-            ImGui.sameLine();
-            this.renderTab(this.weatherDebugTabOpen, "Weather Debug");
             ImGui.sameLine();
             this.renderTab(this.personaDebugTabOpen, "Persona Debug");
             ImGui.sameLine();
@@ -147,9 +108,6 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             }
             if (this.packetLogTabOpen.get()) {
                 this.proxy.getPacketLog().render(this.proxy);
-            }
-            if (this.weatherDebugTabOpen.get()) {
-                this.renderWeatherDebug();
             }
             if (this.personaDebugTabOpen.get()) {
                 this.renderPersonaDebug(configRegistry, settingsConfig);
@@ -351,155 +309,6 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             ImGui.endDisabled();
         }
         ImGui.end();
-    }
-
-    private void renderWeatherDebug() {
-        if (ImGui.begin("Weather Debug",
-            ImGuiWindowFlags.NoCollapse)) {
-            this.proxy.getImGuiAdapter().trackWindow("weather");
-
-            ImGui.text("Client weather debugging");
-            ImGui.spacing();
-
-            final ImInt selectedWeatherType = new ImInt(this.selectedWeatherType.ordinal());
-            if (ImGui.combo("Weather Type Override", selectedWeatherType, WeatherType.getTypes())) {
-                this.selectedWeatherType = WeatherType.VALUES[selectedWeatherType.get()];
-            }
-
-            switch (this.selectedWeatherType) {
-                case CLEAR -> {
-                    this.sendLevelEvent(LevelEvent.STOP_RAINING, 0);
-                    this.sendLevelEvent(LevelEvent.STOP_THUNDERSTORM, 0);
-                    this.thunderstormTick = 0L;
-                }
-                case RAIN -> this.sendLevelEvent(LevelEvent.START_RAINING, Integer.MAX_VALUE);
-                case THUNDERSTORM -> {
-                    this.sendLevelEvent(LevelEvent.START_THUNDERSTORM, Integer.MAX_VALUE);
-
-                    final ImInt selectedThunderstormIntensity = new ImInt(
-                        this.selectedThunderstormIntensity.ordinal()
-                    );
-                    ImGui.spacing();
-                    if (ImGui.combo("Thunderstorm Intensity", selectedThunderstormIntensity,
-                        ThunderstormIntensity.getTypes())) {
-                        this.selectedThunderstormIntensity = ThunderstormIntensity.VALUES
-                            [selectedThunderstormIntensity.get()];
-                    }
-                    ImGui.separator();
-                    switch (this.selectedThunderstormIntensity) {
-                        case NORMAL -> {
-                            if (this.thunderstormTick % 1500 == 0) {
-                                this.summonLightningStrike();
-                            }
-                        }
-                        case ADVANCED -> {
-                            if (this.thunderstormTick % 500 == 0) {
-                                this.summonLightningStrike();
-                            }
-                        }
-                        case EXTREME -> {
-                            if (this.thunderstormTick % 50 == 0) {
-                                this.summonLightningStrike();
-                            }
-                        }
-                    }
-                    this.thunderstormTick++;
-                }
-            }
-            final ImInt selectedFog =
-                new ImInt(this.selectedFogIndex == -1 ? 0 : this.selectedFogIndex);
-            if (ImGui.combo("Fog Override", selectedFog, this.fogIds)) {
-                this.selectedFogIndex = selectedFog.get();
-            }
-            if (this.selectedFogIndex != -1) {
-                if (ImGui.button("Clear Fog Stack")) {
-                    this.selectedFogIndex = -1;
-                }
-            }
-            final PlayerFogPacket packet = new PlayerFogPacket();
-            if (this.selectedFogIndex != -1) {
-                packet.getFogStack().add(this.fogIds[this.selectedFogIndex]);
-            }
-            this.proxy.getServer().sendPacket(packet);
-        }
-        ImGui.end();
-    }
-
-    private void sendLevelEvent(LevelEvent type, int data) {
-        final LevelEventPacket packet = new LevelEventPacket();
-        packet.setType(type);
-        packet.setPosition(this.proxy.getPlayer().getPosition());
-        packet.setData(data);
-
-        this.proxy.getServer().sendPacket(packet);
-    }
-
-    private void summonLightningStrike() {
-        final Random random = ThreadLocalRandom.current();
-        final long id = random.nextLong();
-        final AddActorPacket packet = new AddActorPacket();
-        packet.setTargetActorID(id);
-        packet.setTargetRuntimeID(id);
-        packet.setActorType("minecraft:lightning_bolt");
-        packet.setPosition(this.proxy.getPlayer().getPosition()
-            .add(
-                random.nextInt(-256, 256),
-                0,
-                random.nextInt(-256, 256)
-            )
-        );
-        packet.setVelocity(Vector3f.ZERO);
-        packet.setRotation(Vector2f.ZERO);
-        this.proxy.getServer().sendPacket(packet);
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    private enum WeatherType {
-        NONE("None"),
-        CLEAR("Clear"),
-        RAIN("Rain"),
-        THUNDERSTORM("Thunderstorm");
-
-        private static final WeatherType[] VALUES = values();
-        private static String[] TYPES;
-
-        private final String id;
-
-        private static String[] getTypes() {
-            if (TYPES != null) {
-                return TYPES;
-            }
-            TYPES = new String[VALUES.length];
-            for (int i = 0; i < VALUES.length; i++) {
-                TYPES[i] = VALUES[i].getId();
-            }
-            return TYPES;
-        }
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    private enum ThunderstormIntensity {
-        NORMAL("Normal"),
-        ADVANCED("Advanced"),
-        EXTREME("Extreme");
-
-        private static final ThunderstormIntensity[] VALUES = values();
-        private static String[] TYPES;
-
-        private final String id;
-
-        private static String[] getTypes() {
-            if (TYPES != null) {
-                return TYPES;
-            }
-            TYPES = new String[VALUES.length];
-            for (int i = 0; i < VALUES.length; i++) {
-                TYPES[i] = VALUES[i].getId();
-            }
-            return TYPES;
-        }
     }
 
     private void renderPersonaDebug(ConfigRegistry configRegistry, SettingsConfig config) {
