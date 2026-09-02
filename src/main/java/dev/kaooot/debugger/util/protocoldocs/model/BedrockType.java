@@ -25,6 +25,8 @@ public class BedrockType {
     private String ref;
     @SerializedName("enum")
     private List<String> enumValues;
+    @SerializedName("x-enum-binary-value")
+    private List<Long> enumBinaryValues;
     @SerializedName("x-underlying-type")
     private ValueType underlyingType;
     @SerializedName("x-protocol-version")
