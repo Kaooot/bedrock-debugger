@@ -10,6 +10,12 @@ authorized testing.
 
 Third-party dependencies remain subject to their respective licenses.
 
+## Star the Repo ⭐
+
+If you find this project useful, please consider giving it a star! Countless hours of development have gone into
+building bedrock-debugger, and it's all publicly available — a star is a small gesture that goes a long way and is
+genuinely appreciated.
+
 ## Intended Use
 
 The anti-cheat testing and malicious client simulation features included in this project are intended solely for

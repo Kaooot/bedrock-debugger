@@ -13,6 +13,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -47,6 +48,13 @@ public class ProtocolDocsParser {
         }
         File protocolDocsDataFolder = null;
         for (final BedrockType schema : definitions.values()) {
+            if (schema.isEnum()) {
+                final File folder = this.writeEnumMarkdown(dataLogsFolder, schema);
+                if (folder != null) {
+                    protocolDocsDataFolder = folder;
+                }
+                continue;
+            }
             if (!schema.isPacket()) {
                 continue;
             }
@@ -116,6 +124,46 @@ public class ProtocolDocsParser {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        return protocolDocsDataFolder;
+    }
+
+    private File writeEnumMarkdown(File dataLogsFolder, BedrockType schema) {
+        final List<String> values = schema.getEnumValues();
+        final List<Long> binaryValues = schema.getEnumBinaryValues();
+        if (values == null || values.isEmpty() || binaryValues == null ||
+            binaryValues.isEmpty()) {
+            return null;
+        }
+        final String title = schema.getTitle();
+        final File protocolDocsDataFolder = new File(
+            dataLogsFolder + "/protocoldocs-v" + schema.getProtocolVersion()
+        );
+        final File enumsFolder = new File(protocolDocsDataFolder, "enums");
+        if (!enumsFolder.exists()) {
+            enumsFolder.mkdirs();
+        }
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append("# ").append(title).append("\n\n");
+        builder.append("| Name | ID |\n");
+        builder.append("| --- | --- |\n");
+        for (int i = 0; i < values.size(); i++) {
+            final Long binaryValue = binaryValues != null && i < binaryValues.size()
+                ? binaryValues.get(i)
+                : null;
+            builder.append("| ")
+                .append(values.get(i))
+                .append(" | ")
+                .append(binaryValue != null ? binaryValue : "")
+                .append(" |\n");
+        }
+
+        final String finalTitle = title.replace(":", "_");
+        try (final FileWriter writer = new FileWriter(new File(enumsFolder, finalTitle + ".md"))) {
+            writer.write(builder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return protocolDocsDataFolder;
     }

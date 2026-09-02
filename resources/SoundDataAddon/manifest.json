@@ -1,9 +1,9 @@
 {
   "format_version": 2,
   "header": {
-    "name": "BlockPaletteDumper",
-    "description": "Dumps the block palette.",
-    "uuid": "14e467b4-e3aa-49d3-8352-f8439fd7b2ee",
+    "name": "SoundDataAddon",
+    "description": "Used for sound data debugging",
+    "uuid": "3cedd5c3-c711-4459-a23c-4004f66a0b02",
     "version": [
       1,
       0,
@@ -20,7 +20,7 @@
       "description": "Script resources",
       "language": "javascript",
       "type": "script",
-      "uuid": "7c7e693f-99f4-41a9-95e0-1f57b37e1e12",
+      "uuid": "6728679c-f6dd-4a17-bd43-cda7e0330f09",
       "version": [
         1,
         0,
@@ -32,11 +32,7 @@
   "dependencies": [
     {
       "module_name": "@minecraft/server",
-      "version": "2.5.0"
-    },
-    {
-      "module_name": "@minecraft/server-net",
-      "version": "1.0.0-beta"
+      "version": "beta"
     }
   ]
 }
