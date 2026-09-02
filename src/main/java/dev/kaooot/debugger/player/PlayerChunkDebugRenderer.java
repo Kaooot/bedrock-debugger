@@ -65,7 +65,9 @@ public class PlayerChunkDebugRenderer {
                 GeneratorType.UNDEFINED,
                 dimension,
                 new UUID(0L, 0L),
-                "minecraft:ocean"
+                "minecraft:ocean",
+                0,
+                false
             );
         }
         return target;

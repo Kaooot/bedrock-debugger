@@ -1,5 +1,8 @@
 {
   "access_button@common_buttons.light_content_button": {
     "bindings": []
+  },
+  "content_panel": {
+    "controls": []
   }
 }
