@@ -24,9 +24,7 @@ import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorDataTypes;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandParamType;
-import org.cloudburstmc.protocol.bedrock.data.map.MapPixel;
 import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
-import org.cloudburstmc.protocol.bedrock.packet.MapInfoRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.SetActorDataPacket;
 
 /**
@@ -43,7 +41,6 @@ import org.cloudburstmc.protocol.bedrock.packet.SetActorDataPacket;
             values = {
                 @CommandEnumValue(name = "settings"),
                 @CommandEnumValue(name = "imgui"),
-                @CommandEnumValue(name = "bad_packet"),
                 @CommandEnumValue(name = "version"),
                 @CommandEnumValue(name = "shapes"),
                 @CommandEnumValue(name = "sleeping"),
@@ -59,25 +56,13 @@ public class TestCommand extends Command<BedrockDebuggerProxy> {
             switch (args[0]) {
                 case "settings" -> new ServerSettingsMenu().show(proxy);
                 case "imgui" -> proxy.getImGuiAdapter().toggle();
-                case "bad_packet" -> {
-                    final MapInfoRequestPacket packet = new MapInfoRequestPacket();
-                    packet.setMapUniqueID(0L);
-                    for (int i = 0; i < 65000; i++) {
-                        packet.getClientPixelsList().add(new MapPixel(0, i));
-                    }
-
-                    proxy.getClient().sendPacket(packet);
-                    proxy.getPlayer().sendMessage("Sent bad packet");
-                }
-                case "version" -> {
-                    proxy.getPlayer().sendMessage("Version info dump: " +
-                        proxy.getPlayer().getLoginData().getGameVersion() +
-                        ", Client Network Version " +
-                        proxy.getPlayer().getLoginData().getClientNetworkVersion() +
-                        ", Preview flag: " +
-                        proxy.getPlayer().getLoginData().isPreview()
-                    );
-                }
+                case "version" -> proxy.getPlayer().sendMessage("Version: " +
+                    proxy.getPlayer().getLoginData().getGameVersion() +
+                    ", Client Network Version " +
+                    proxy.getPlayer().getLoginData().getClientNetworkVersion() +
+                    ", isPreview: " +
+                    proxy.getPlayer().getLoginData().isPreview()
+                );
                 case "shapes" -> {
                     final List<DebugShape> shapes = new ObjectArrayList<>();
 

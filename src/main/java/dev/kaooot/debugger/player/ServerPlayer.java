@@ -18,18 +18,16 @@ import dev.kaooot.debugger.util.Util;
 @Getter
 public class ServerPlayer {
 
+    public static final float EYE_HEIGHT = 1.62f;
+    private static final float WIDTH = 0.6f;
+    private static final float HEIGHT = 1.8f;
+
     private final long actorId;
     private final long runtimeId;
     private final BedrockDebuggerProxy proxy;
 
     @Setter
     private Vector3f position = Vector3f.ZERO;
-    @Getter
-    private final float width = 0.6f;
-    @Getter
-    private final float height = 1.8f;
-    @Getter
-    private final float eyeHeight = 1.62f;
     @Getter
     @Setter
     private String nameTag;
@@ -47,14 +45,14 @@ public class ServerPlayer {
 
         final DebugBox box = new DebugBox();
         box.setId(playerBoxId);
-        box.setLocation(Vector3f.from(0f, this.height / 2f, 0f));
+        box.setLocation(Vector3f.from(0f, HEIGHT / 2f, 0f));
         box.setColor(Util.rgbToColor(
                 settingsConfig.getPlayerDebugRendererColorR(),
                 settingsConfig.getPlayerDebugRendererColorG(),
                 settingsConfig.getPlayerDebugRendererColorB()
             )
         );
-        box.setBoxBound(Vector3f.from(this.width, this.height, this.width));
+        box.setBoxBound(Vector3f.from(WIDTH, HEIGHT, WIDTH));
         box.setAttachedToEntityID(this.actorId);
 
         this.proxy.getDebugShapeRenderer().renderShapes(box);

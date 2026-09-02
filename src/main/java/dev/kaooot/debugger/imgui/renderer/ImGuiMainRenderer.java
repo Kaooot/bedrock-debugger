@@ -171,7 +171,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                 ImGui.tableHeadersRow();
 
                 final Map<String, DebugMarkerSettings> ids =
-                    this.proxy.getPlayer().getCustomBlockRenderSettings();
+                    this.proxy.getPlayer().getChunkDebugRenderer().getCustomBlockRenderSettings();
                 for (final String identifier : this.proxy.getBlockPaletteManager()
                     .getKnownCustomBlockIdentifiers()) {
                     if (!this.customBlockIdFilter.isEmpty() &&
@@ -184,8 +184,8 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                     ImGui.text(identifier);
                     ImGui.tableSetColumnIndex(1);
                     final ImBoolean renderDebugMarker = new ImBoolean(
-                        this.proxy.getPlayer().getCustomBlockRenderSettings()
-                            .containsKey(identifier)
+                        this.proxy.getPlayer().getChunkDebugRenderer()
+                            .getCustomBlockRenderSettings().containsKey(identifier)
                     );
 
                     if (ImGui.checkbox("Render Debug Marker", renderDebugMarker)) {
@@ -237,7 +237,7 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
         CompletableFuture.runAsync(() -> {
             for (final LevelChunk chunk : this.proxy.getPlayer().getPlayerChunkManager()
                 .getChunks().values()) {
-                this.proxy.getPlayer().updateCustomBlockDebugMarkers(chunk);
+                this.proxy.getPlayer().getChunkDebugRenderer().updateCustomBlockDebugMarkers(chunk);
             }
         });
     }
@@ -297,8 +297,11 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
             }
 
             ImGui.spacing();
-            this.checkboxToggle("CPS Override", settings.isCpsOverrideEnabled(),
-                settings::setCpsOverrideEnabled);
+            this.checkboxToggle(
+                "CPS Override",
+                settings.isCpsOverrideEnabled(),
+                settings::setCpsOverrideEnabled
+            );
             ImGui.beginDisabled(!settings.isCpsOverrideEnabled());
             ImGui.setNextItemWidth(140f);
             final ImInt clicksPerSecond = new ImInt(settings.getClicksPerSecond());
@@ -307,6 +310,21 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                 settings.setClicksPerSecond(clicksPerSecond.get());
             }
             ImGui.endDisabled();
+            ImGui.spacing();
+            ImGui.separatorText("Movement");
+            this.checkboxToggle(
+                "Enhanced Fly Speed Enabled",
+                settings.isEnhancedFlySpeedEnabled(),
+                enhancedFlySpeedEnabled -> {
+                    settings.setEnhancedFlySpeedEnabled(enhancedFlySpeedEnabled);
+                    this.proxy.getPlayer().getCheatClientAuthority().updateEnhancedFlySpeed();
+                }
+            );
+            ImGui.spacing();
+            ImGui.separatorText("Miscellaneous");
+            if (ImGui.button("Send Bad Packet")) {
+                this.proxy.getPlayer().getCheatClientAuthority().sendBadPacket();
+            }
         }
         ImGui.end();
     }

@@ -63,6 +63,9 @@ public class LevelSubChunk {
         final SubChunkStorage<Block> storage = this.storages[layer];
         for (int index = 0; index < 4096; index++) {
             final int paletteIndex = storage.getBitArray().get(index);
+            if (paletteIndex >= storage.getPalette().size()) {
+                break;
+            }
             final Block block = storage.getPalette().get(paletteIndex);
             final int blockX = (index >> 8) & 15;
             final int blockZ = (index >> 4) & 15;

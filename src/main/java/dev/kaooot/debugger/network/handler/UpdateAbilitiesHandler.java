@@ -14,7 +14,7 @@ public class UpdateAbilitiesHandler implements PacketHandler<UpdateAbilitiesPack
 
     @Override
     public PacketSignal handle(UpdateAbilitiesPacket packet, BedrockDebuggerProxy proxy) {
-        proxy.getPlayer().handleEnhancedFlySpeedAbilities(packet);
+        proxy.getPlayer().getCheatClientAuthority().handleEnhancedFlySpeed(packet);
         return PacketSignal.UNHANDLED;
     }
 }

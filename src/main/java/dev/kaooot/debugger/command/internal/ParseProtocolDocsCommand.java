@@ -21,7 +21,7 @@ import dev.kaooot.debugger.core.registry.RegistryKey;
  */
 @Name("parseprotocoldocs")
 @Description("Outputs valid svg files for packet schema descriptions")
-public class ParseProtocolDocsCommand extends GenerateCommand {
+public class ParseProtocolDocsCommand extends AdvancedDumpCommand {
 
     @Override
     public void execute(String command, String[] args, BedrockDebuggerProxy proxy) {

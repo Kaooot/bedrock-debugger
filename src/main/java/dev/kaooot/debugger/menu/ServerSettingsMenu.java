@@ -47,7 +47,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         this.addDebugSection(testConfig, elements);
 
         final FormListener<CustomResponse> listener =
-            proxy.getPlayer().showForm(
+            proxy.getPlayer().getFormManager().showForm(
                 CustomForm.builder()
                     .title(DebugElement.WIDE_SERVER_FORM.getKey() + "Settings")
                     .build()
@@ -500,7 +500,8 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig.isRenderCurrentChunk(),
             renderCurrentChunk -> {
                 settingsConfig.setRenderCurrentChunk(renderCurrentChunk);
-                proxy.getPlayer().toggleRenderCurrentChunk(renderCurrentChunk);
+                proxy.getPlayer().getChunkDebugRenderer()
+                    .toggleRenderCurrentChunk(renderCurrentChunk);
             },
             proxy,
             "Current Chunk Rendering"

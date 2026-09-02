@@ -1,4 +1,4 @@
-# Block Palette Generation Guide
+# Block Palette Generation Guide (Deprecated)
 
 The block-palette-dumper script can be used to generate vanilla item tags, block tags and a block dump. The data is sent
 over the network, see DebugServerHelper and DebugHttpServer for more info.

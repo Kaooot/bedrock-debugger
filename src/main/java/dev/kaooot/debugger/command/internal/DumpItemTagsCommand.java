@@ -12,9 +12,9 @@ import dev.kaooot.debugger.util.DebugServerHelper;
  *
  * @author Kaooot
  */
-@Name("generateblockpalette")
-@Description("Generates the block palette.")
-public class GenerateBlockPaletteCommand extends GenerateCommand {
+@Name("dumpitemtags")
+@Description("Outputs valid item tags in a json format.")
+public class DumpItemTagsCommand extends AdvancedDumpCommand {
 
     private boolean flag;
 
@@ -25,6 +25,8 @@ public class GenerateBlockPaletteCommand extends GenerateCommand {
             return;
         }
         this.flag = true;
+        final String fileName = "item_tags";
+        final File file = new File(proxy.getDataFolder() + "/logs/" + fileName + ".json");
         final DebugServerHelper helper = new DebugServerHelper(proxy);
         helper.startDebugServer().whenComplete((result, throwable) -> {
             if (throwable != null) {
@@ -33,18 +35,17 @@ public class GenerateBlockPaletteCommand extends GenerateCommand {
                 return;
             }
 
-            proxy.getDebugHttpServer().addListener(DebugHttpServer.ListenerType.BLOCKS, blocks -> {
-                try {
-                    final File outputFile = proxy.getBlockPaletteGenerator().generate(blocks);
-                    proxy.getPlayer().sendMessage(
-                        "Success! :) File output to: " + outputFile.getAbsolutePath()
-                    );
-                } catch (Exception e) {
-                    proxy.getPlayer().sendMessage("§cFailure :( Error: " + e.getMessage());
-                }
-                helper.stopDebugServer();
-                this.flag = false;
-            });
+            proxy.getDebugHttpServer().addListener(DebugHttpServer.ListenerType.ITEM_TAGS,
+                itemTags -> {
+                    this.saveJsonFile(file, itemTags, proxy);
+
+                    helper.stopDebugServer();
+
+                    proxy.getPlayer().sendMessage("Success! :) File output to: " +
+                        file.getAbsolutePath());
+
+                    this.flag = false;
+                });
         });
     }
 }

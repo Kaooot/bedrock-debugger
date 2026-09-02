@@ -27,7 +27,6 @@ import dev.kaooot.debugger.player.ProxiedPlayer;
 import dev.kaooot.debugger.player.ServerPlayer;
 import dev.kaooot.debugger.server.ProxiedServer;
 import dev.kaooot.debugger.util.BedrockGameVersion;
-import dev.kaooot.debugger.util.BlockPaletteGenerator;
 import dev.kaooot.debugger.util.BlockPaletteManager;
 import dev.kaooot.debugger.util.DebugHttpServer;
 import dev.kaooot.debugger.util.DebugScreenInfo;
@@ -94,7 +93,6 @@ public class BedrockDebuggerProxy {
     private final PacketLog packetLog = new PacketLog(this);
 
     private final DebugHttpServer debugHttpServer;
-    private final BlockPaletteGenerator blockPaletteGenerator;
     private final ProtocolDocsParser protocolDocsParser;
 
     public BedrockDebuggerProxy() {
@@ -151,7 +149,6 @@ public class BedrockDebuggerProxy {
         this.debugHttpServer = new DebugHttpServer(this);
         this.debugHttpServer.start();
 
-        this.blockPaletteGenerator = new BlockPaletteGenerator(this);
         this.protocolDocsParser = new ProtocolDocsParser();
 
         this.connect(config);

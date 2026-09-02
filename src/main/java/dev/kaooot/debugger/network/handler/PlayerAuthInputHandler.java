@@ -37,7 +37,8 @@ public class PlayerAuthInputHandler implements PacketHandler<PlayerAuthInputPack
         packet.setNewInteractionModel(Util.getInputInteractionModel(platformType));
 
         if (proxy.getPlayer().isReadyToRoll() && settingsConfig.isRenderCurrentChunk()) {
-            proxy.getPlayer().updateChunkPosForRenderingIfEnabled(settingsConfig);
+            proxy.getPlayer().getChunkDebugRenderer()
+                .updateChunkPosForRenderingIfEnabled(settingsConfig);
         }
         if (proxy.getPlayer().getCheatClientAuthority().handleNuker(packet)) {
             proxy.getClient().sendPacket(packet);

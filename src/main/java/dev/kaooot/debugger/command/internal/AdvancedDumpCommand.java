@@ -14,7 +14,7 @@ import dev.kaooot.debugger.api.command.Command;
  *
  * @author Kaooot
  */
-public abstract class GenerateCommand extends Command<BedrockDebuggerProxy> {
+public abstract class AdvancedDumpCommand extends Command<BedrockDebuggerProxy> {
 
     protected void saveJsonFile(File file, byte[] data, BedrockDebuggerProxy proxy) {
         this.saveJsonFile(file, data, proxy, JsonObject.class);

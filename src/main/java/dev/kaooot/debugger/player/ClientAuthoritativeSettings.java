@@ -13,6 +13,7 @@ public class ClientAuthoritativeSettings {
     private boolean bypassInvalidCreativeDestroyAction;
     private boolean forceMineAbilityEnabled;
     private boolean nukerEnabled;
+    private boolean enhancedFlySpeedEnabled;
     private int nukerWidth = 1;
     private int nukerHeight = 0;
     private float actorInteractionRange = 4.0f;

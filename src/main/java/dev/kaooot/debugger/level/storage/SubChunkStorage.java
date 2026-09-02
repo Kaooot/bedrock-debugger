@@ -1,5 +1,7 @@
 package dev.kaooot.debugger.level.storage;
 
+import dev.kaooot.debugger.level.storage.bitarray.BitArray;
+import dev.kaooot.debugger.level.storage.bitarray.BitArrayVersion;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
@@ -10,8 +12,6 @@ import lombok.Getter;
 import org.cloudburstmc.nbt.NBTInputStream;
 import org.cloudburstmc.nbt.NbtUtils;
 import org.cloudburstmc.protocol.common.util.VarInts;
-import dev.kaooot.debugger.level.storage.bitarray.BitArray;
-import dev.kaooot.debugger.level.storage.bitarray.BitArrayVersion;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -94,8 +94,8 @@ public class SubChunkStorage<V> {
                          final NBTInputStream inputStream = NbtUtils.createNetworkReader(
                              bufInputStream)) {
                         inputStream.readTag();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (Throwable ignored) {
+
                     }
                 }
             }

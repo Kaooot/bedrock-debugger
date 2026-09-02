@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Name("dumpparticles")
 @Description("Outputs valid particle types in a json format.")
-public class DumpParticlesCommand extends GenerateCommand {
+public class DumpParticlesCommand extends AdvancedDumpCommand {
 
     @Override
     public void execute(String command, String[] args, BedrockDebuggerProxy proxy) {
