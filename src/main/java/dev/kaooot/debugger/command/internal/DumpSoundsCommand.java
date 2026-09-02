@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Name("dumpsounds")
 @Description("Outputs valid level sound events in a json format.")
-public class DumpSoundsCommand extends GenerateCommand {
+public class DumpSoundsCommand extends AdvancedDumpCommand {
 
     @Override
     public void execute(String command, String[] args, BedrockDebuggerProxy proxy) {

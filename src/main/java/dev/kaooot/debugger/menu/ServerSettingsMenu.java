@@ -47,7 +47,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         this.addDebugSection(testConfig, elements);
 
         final FormListener<CustomResponse> listener =
-            proxy.getPlayer().showForm(
+            proxy.getPlayer().getFormManager().showForm(
                 CustomForm.builder()
                     .title(DebugElement.WIDE_SERVER_FORM.getKey() + "Settings")
                     .build()
@@ -95,16 +95,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         packsToggle.setTooltip(
             "If debug packs are enabled or not. The debug screen will not be " +
                 "rendered when disabled. Defaults to true."
-        );
-
-        final Toggle enableExperimentalImGuiToggle = new Toggle();
-        enableExperimentalImGuiToggle.setId("toggle-enable_experimental_imgui");
-        enableExperimentalImGuiToggle.setText(
-            "Enable Experimental ImGui Renderer (requires restart)"
-        );
-        enableExperimentalImGuiToggle.setDefaultValue(settingsConfig.isEnableExperimentalImGui());
-        enableExperimentalImGuiToggle.setTooltip(
-            "Enables the Experimental ImGui Renderer. Defaults to false."
         );
 
         final Toggle forceDisableServerAuthBlockBreakingToggle = new Toggle();
@@ -303,6 +293,15 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig.getSubChunkDebugRendererColorB()
         );
 
+        final Toggle packetLogToggle = new Toggle();
+        packetLogToggle.setId("toggle-packet_log");
+        packetLogToggle.setText("Packet Log Enabled");
+        packetLogToggle.setDefaultValue(settingsConfig.isPacketLogEnabled());
+        packetLogToggle.setTooltip(
+            "Whether observed packets are captured in the Packet Log (ImGui overlay) and, when " +
+                "enabled there, written to file. Defaults to true."
+        );
+
         final Input cnsScreenMinPacketNumInput = new Input();
         cnsScreenMinPacketNumInput.setId("input-cns_screen_min_packet_num");
         cnsScreenMinPacketNumInput.setText("CNS Screen Min Packet Num");
@@ -318,12 +317,12 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 header,
                 staticLabel,
                 blobCacheToggle, printDebugInfoToggle, packsToggle,
-                enableExperimentalImGuiToggle,
                 forceDisableServerAuthBlockBreakingToggle,
                 divider,
                 generalSectionLabel,
                 commandsToggle, renderBuildInfoToggle, renderExperimentInfoToggle,
                 spoofDeviceIDToggle,
+                packetLogToggle,
                 cnsScreenMinPacketNumInput,
                 platformTypeSlider,
                 zoneIdOverrideInput,
@@ -407,12 +406,10 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         final String cnsScreenMinPacketNumRaw = response.getInputResponse(
             "input-cns_screen_min_packet_num"
         );
-        final boolean enableExperimentalImGuiToggle = response.getToggleResponse(
-            "toggle-enable_experimental_imgui"
-        );
         final boolean spoofDeviceIdToggle = response.getToggleResponse(
             "toggle-spoof_device_id"
         );
+        final boolean packetLog = response.getToggleResponse("toggle-packet_log");
         final boolean forceDisableServerAuthBlockBreaking = response.getToggleResponse(
             "toggle-force_disable_server_auth_block_breaking"
         );
@@ -492,6 +489,8 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig::setPlayerDebugRendererColorG,
             settingsConfig::setPlayerDebugRendererColorB
         );
+        this.updateToggle(packetLog, settingsConfig.isPacketLogEnabled(),
+            settingsConfig::setPacketLogEnabled, proxy, "Packet Log");
         this.updateToggle(renderBuildInfo, settingsConfig.isRenderBuildInfo(),
             settingsConfig::setRenderBuildInfo, proxy, "Build Info Rendering");
         this.updateToggle(renderExperimentInfo, settingsConfig.isRenderExperimentInfo(),
@@ -501,7 +500,8 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig.isRenderCurrentChunk(),
             renderCurrentChunk -> {
                 settingsConfig.setRenderCurrentChunk(renderCurrentChunk);
-                proxy.getPlayer().toggleRenderCurrentChunk(renderCurrentChunk);
+                proxy.getPlayer().getChunkDebugRenderer()
+                    .toggleRenderCurrentChunk(renderCurrentChunk);
             },
             proxy,
             "Current Chunk Rendering"
@@ -558,14 +558,6 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             proxy.getPlayer().sendMessage("§cInvalid Zone ID");
             return;
         }
-
-        this.updateToggle(
-            enableExperimentalImGuiToggle,
-            settingsConfig.isEnableExperimentalImGui(),
-            settingsConfig::setEnableExperimentalImGui,
-            proxy,
-            "Experimental ImGui Renderer"
-        );
 
         this.updateToggle(
             spoofDeviceIdToggle,

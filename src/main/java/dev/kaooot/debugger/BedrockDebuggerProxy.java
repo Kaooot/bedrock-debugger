@@ -21,27 +21,22 @@ import dev.kaooot.debugger.imgui.ImGuiAdapter;
 import dev.kaooot.debugger.input.KeyInputListener;
 import dev.kaooot.debugger.logging.MainLogger;
 import dev.kaooot.debugger.network.NetworkConstants;
+import dev.kaooot.debugger.network.log.PacketLog;
 import dev.kaooot.debugger.pack.PackManager;
 import dev.kaooot.debugger.player.ProxiedPlayer;
 import dev.kaooot.debugger.player.ServerPlayer;
 import dev.kaooot.debugger.server.ProxiedServer;
 import dev.kaooot.debugger.util.BedrockGameVersion;
-import dev.kaooot.debugger.util.BlockPaletteGenerator;
 import dev.kaooot.debugger.util.BlockPaletteManager;
 import dev.kaooot.debugger.util.DebugHttpServer;
 import dev.kaooot.debugger.util.DebugScreenInfo;
 import dev.kaooot.debugger.util.RuntimeBlockDefinitionRegistry;
-import dev.kaooot.debugger.util.protocoldocs.ProtocolDocsGenerator;
-import io.netty.util.ResourceLeakDetector;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import it.unimi.dsi.fastutil.longs.LongSet;
+import dev.kaooot.debugger.util.protocoldocs.ProtocolDocsParser;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.security.KeyPair;
-import java.security.SecureRandom;
 import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.cloudburstmc.protocol.bedrock.util.EncryptionUtils;
@@ -54,6 +49,8 @@ import org.cloudburstmc.protocol.common.util.Preconditions;
  */
 @Getter
 public class BedrockDebuggerProxy {
+
+    private static final int CONFIG_RELOAD_PERIOD_TICKS = 600;
 
     private final Logger logger = new MainLogger();
     private final MsaAuth msaAuth;
@@ -93,10 +90,10 @@ public class BedrockDebuggerProxy {
     private boolean transferring;
 
     private final ImGuiAdapter imGuiAdapter;
+    private final PacketLog packetLog = new PacketLog(this);
 
     private final DebugHttpServer debugHttpServer;
-    private final BlockPaletteGenerator blockPaletteGenerator;
-    private final ProtocolDocsGenerator protocolDocsGenerator;
+    private final ProtocolDocsParser protocolDocsParser;
 
     public BedrockDebuggerProxy() {
         System.setProperty("bedrock.maxDecompressedBytes", String.valueOf(Integer.MAX_VALUE));
@@ -143,6 +140,8 @@ public class BedrockDebuggerProxy {
         this.keyInputListener = new KeyInputListener(this);
         this.keyInputListener.init();
 
+        this.scheduler.schedule(configRegistry::reloadAll, CONFIG_RELOAD_PERIOD_TICKS);
+
         this.authServiceConnection = new AuthServiceConnection(this);
         this.gatheringServiceConnection = new GatheringServiceConnection(this);
 
@@ -150,8 +149,7 @@ public class BedrockDebuggerProxy {
         this.debugHttpServer = new DebugHttpServer(this);
         this.debugHttpServer.start();
 
-        this.blockPaletteGenerator = new BlockPaletteGenerator(this);
-        this.protocolDocsGenerator = new ProtocolDocsGenerator();
+        this.protocolDocsParser = new ProtocolDocsParser();
 
         this.connect(config);
         this.server = new ProxiedServer(new InetSocketAddress(config.getProxyAddress(),
@@ -160,6 +158,7 @@ public class BedrockDebuggerProxy {
         this.debugShapeRenderer = new DebugShapeRenderer(this.server);
         this.shutdownIfDisconnected();
         this.debugHttpServer.stop();
+        this.imGuiAdapter.stop();
         System.exit(0);
     }
 

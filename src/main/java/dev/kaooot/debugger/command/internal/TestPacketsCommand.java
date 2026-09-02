@@ -1134,9 +1134,17 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testDimensionData(BedrockDebuggerProxy proxy) {
         final DimensionDataPacket packet = new DimensionDataPacket();
-        packet.getDefinitions().add(new DimensionDefinition("minecraft:overworld",
-            320, -64, GeneratorType.LEGACY, DimensionType.from(Dimension.OVERWORLD),
-            new UUID(0L, 0L)));
+        packet.getDefinitions().add(
+            new DimensionDefinition(
+                "minecraft:overworld",
+                320,
+                -64,
+                GeneratorType.LEGACY,
+                DimensionType.from(Dimension.OVERWORLD),
+                new UUID(0L, 0L),
+                "minecraft:ocean"
+            )
+        );
         proxy.getServer().sendPacket(packet);
     }
 

@@ -1,4 +1,7 @@
 {
+  "hud_screen": {
+    "render_only_when_topmost": false
+  },
   "left_debug_panel": {
     "$hide_key": "?&!!",
     "$update_key": "!&??",

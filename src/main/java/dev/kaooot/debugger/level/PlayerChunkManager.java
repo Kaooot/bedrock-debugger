@@ -58,7 +58,7 @@ public class PlayerChunkManager {
                 this.proxy
             )
         );
-        this.player.updateCustomBlockDebugMarkers(chunk);
+        this.player.getChunkDebugRenderer().updateCustomBlockDebugMarkers(chunk);
     }
 
     public void handleUpdateSubChunkBlocks(UpdateSubChunkBlocksPacket packet) {
@@ -99,7 +99,7 @@ public class PlayerChunkManager {
                 extraBlock.getDefinition().getRuntimeId()
             );
         }
-        this.player.updateCustomBlockDebugMarkers(chunk);
+        this.player.getChunkDebugRenderer().updateCustomBlockDebugMarkers(chunk);
     }
 
     public void handleUpdateBlock(BlockDefinition definition, Vector3i blockPos, int layer) {
@@ -119,7 +119,7 @@ public class PlayerChunkManager {
                 shapeId -> shapeId.startsWith("debug_marker_") && shapeId.contains(pos)
             );
         }
-        this.player.updateCustomBlockDebugMarkers(chunk);
+        this.player.getChunkDebugRenderer().updateCustomBlockDebugMarkers(chunk);
     }
 
     public void handleBlockActorData(BlockActorDataPacket packet) {

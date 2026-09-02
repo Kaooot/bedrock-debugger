@@ -1,9 +1,11 @@
 package dev.kaooot.debugger.config;
 
 import com.google.gson.annotations.SerializedName;
+import dev.kaooot.debugger.api.config.Config;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import dev.kaooot.debugger.api.config.Config;
 import org.cloudburstmc.protocol.bedrock.data.PlatformType;
 
 /**
@@ -61,8 +63,10 @@ public class SettingsConfig extends Config {
     private int subChunkDebugRendererColorB = 85;
     @SerializedName("cns_screen_min_packet_num")
     private int cnsScreenMinPacketNum = 1;
-    @SerializedName("enable_experimental_imgui")
-    private boolean enableExperimentalImGui;
+    @SerializedName("packet_log_enabled")
+    private boolean packetLogEnabled = true;
+    @SerializedName("packet_log_exclusion_list")
+    private List<String> packetLogExclusionList = new ObjectArrayList<>();
     @SerializedName("override_client_network_version")
     private boolean overrideClientNetworkVersion;
     @SerializedName("should_spoof_device_id")

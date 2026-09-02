@@ -28,7 +28,7 @@ public class BedrockEnum extends BedrockProperty {
 
     @Override
     public Node toNode(AtomicInteger id, String label, boolean optional,
-                       Map<Long, BedrockType> definitions, List<Integer> lastOnes,
+                       Map<String, BedrockType> definitions, List<Integer> lastOnes,
                        Attributes<? extends ForNode> style) {
         final Node node = Factory.node(String.valueOf(id.get()))
             .with("id", id)
@@ -56,11 +56,14 @@ public class BedrockEnum extends BedrockProperty {
 
     @Override
     public Node toNode(AtomicInteger id, String label, boolean optional,
-                       Map<Long, BedrockType> definitions, List<Integer> lastOnes) {
+                       Map<String, BedrockType> definitions, List<Integer> lastOnes) {
         return this.toNode(id, label, optional, definitions, lastOnes, null);
     }
 
     private String getPrettifiedTitle() {
-        return !this.title.startsWith("enum") ? "enum " + this.title : title;
+        if (this.title == null || this.title.isEmpty()) {
+            return "enum";
+        }
+        return this.title.startsWith("enum") ? this.title : "enum " + this.title;
     }
 }

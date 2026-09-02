@@ -14,7 +14,8 @@ public class DimensionDataHandler implements PacketHandler<DimensionDataPacket> 
 
     @Override
     public PacketSignal handle(DimensionDataPacket packet, BedrockDebuggerProxy proxy) {
-        proxy.getPlayer().getDimensionData().addAll(packet.getDefinitions());
+        proxy.getPlayer().getChunkDebugRenderer().getDimensionData()
+            .addAll(packet.getDefinitions());
         return PacketSignal.UNHANDLED;
     }
 }

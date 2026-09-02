@@ -29,9 +29,9 @@ import dev.kaooot.debugger.core.registry.RegistryKey;
  *
  * @author Kaooot
  */
-@Name("generatebiomes")
+@Name("dumpbiomeids")
 @Description("Outputs valid biome ids in a json format.")
-public class GenerateBiomesCommand extends GenerateCommand {
+public class DumpBiomeIdsCommand extends AdvancedDumpCommand {
 
     @Override
     public void execute(String command, String[] args, BedrockDebuggerProxy proxy) {

@@ -19,9 +19,9 @@ import dev.kaooot.debugger.core.registry.RegistryKey;
  *
  * @author Kaooot
  */
-@Name("generateprotocoldocs")
+@Name("parseprotocoldocs")
 @Description("Outputs valid svg files for packet schema descriptions")
-public class GenerateProtocolDocsCommand extends GenerateCommand {
+public class ParseProtocolDocsCommand extends AdvancedDumpCommand {
 
     @Override
     public void execute(String command, String[] args, BedrockDebuggerProxy proxy) {
@@ -42,7 +42,7 @@ public class GenerateProtocolDocsCommand extends GenerateCommand {
                 )
                 .toFile();
 
-            CompletableFuture.supplyAsync(() -> proxy.getProtocolDocsGenerator().generate(
+            CompletableFuture.supplyAsync(() -> proxy.getProtocolDocsParser().parse(
                     proxy.getDataLogsFolder(), protocolFolder.toPath()
                 )
             ).whenComplete((outputFolder, throwable) -> {

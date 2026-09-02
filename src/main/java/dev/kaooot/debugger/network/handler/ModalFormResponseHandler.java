@@ -14,8 +14,8 @@ public class ModalFormResponseHandler implements PacketHandler<ModalFormResponse
 
     @Override
     public PacketSignal handle(ModalFormResponsePacket packet, BedrockDebuggerProxy proxy) {
-        if (proxy.getPlayer().isValidFormId(packet.getFormID())) {
-            proxy.getPlayer().parseFormResponse(packet);
+        if (proxy.getPlayer().getFormManager().isValidFormId(packet.getFormID())) {
+            proxy.getPlayer().getFormManager().parseFormResponse(packet);
             return PacketSignal.HANDLED;
         }
         return PacketSignal.UNHANDLED;

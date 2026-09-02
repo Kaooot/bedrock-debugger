@@ -32,7 +32,7 @@ public class BedrockCondition extends BedrockProperty {
 
     @Override
     public Node toNode(AtomicInteger id, String label, boolean optional,
-                       Map<Long, BedrockType> definitions, List<Integer> lastOnes,
+                       Map<String, BedrockType> definitions, List<Integer> lastOnes,
                        Attributes<? extends ForNode> style) {
         Node node = Factory.node(String.valueOf(id.get()))
             .with("id", id)
@@ -80,7 +80,7 @@ public class BedrockCondition extends BedrockProperty {
 
     @Override
     public Node toNode(AtomicInteger id, String label, boolean optional,
-                       Map<Long, BedrockType> definitions, List<Integer> lastOnes) {
+                       Map<String, BedrockType> definitions, List<Integer> lastOnes) {
         return this.toNode(id, label, optional, definitions, lastOnes, null);
     }
 }

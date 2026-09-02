@@ -30,6 +30,7 @@ import org.cloudburstmc.protocol.bedrock.data.auth.PlayerAuthenticationType;
 import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition;
 import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition;
 import org.cloudburstmc.protocol.bedrock.packet.LoginPacket;
+import org.cloudburstmc.protocol.bedrock.util.EncryptionUtils;
 import org.cloudburstmc.protocol.common.DefinitionRegistry;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import org.cloudburstmc.protocol.common.SimpleDefinitionRegistry;
@@ -123,7 +124,7 @@ public class LoginHandler implements PacketHandler<LoginPacket> {
             proxy.getClient().setItemDefinitions(itemDefinitionRegistry);
             proxy.getServer().setItemDefinitions(itemDefinitionRegistry);
 
-            if (!proxy.isTransferring() && settingsConfig.isEnableExperimentalImGui()) {
+            if (!proxy.isTransferring()) {
                 proxy.getImGuiAdapter().init();
             }
         } catch (ParseException e) {

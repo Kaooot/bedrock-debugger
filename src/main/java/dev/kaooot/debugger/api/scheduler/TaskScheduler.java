@@ -1,6 +1,12 @@
 package dev.kaooot.debugger.api.scheduler;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -9,12 +15,42 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
  */
 public class TaskScheduler {
 
-    private final Int2ObjectArrayMap<Task> tasks = new Int2ObjectArrayMap<>();
+    private static final long MILLIS_PER_TICK = 50L;
+    private static final int POOL_SIZE =
+        Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
+
+    private final AtomicInteger threadCounter = new AtomicInteger();
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(
+        POOL_SIZE,
+        runnable -> {
+            final Thread thread = new Thread(
+                runnable, "task-scheduler-" + this.threadCounter.incrementAndGet()
+            );
+            thread.setDaemon(true);
+            return thread;
+        }
+    );
+    private final Map<Integer, Task> tasks = new ConcurrentHashMap<>();
+    private final AtomicInteger taskIdCounter = new AtomicInteger();
 
     public Task schedule(Runnable runnable, int period, int delay) {
-        final Task task = new Task(runnable, period, delay);
-        task.start();
-        this.tasks.put(this.tasks.size() + 1, task);
+        final Runnable safeRunnable = () -> {
+            try {
+                runnable.run();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        };
+        final long initialDelay = (long) delay * MILLIS_PER_TICK;
+        final ScheduledFuture<?> future = period == 0
+            ? this.executor.schedule(safeRunnable, initialDelay, TimeUnit.MILLISECONDS)
+            : this.executor.scheduleWithFixedDelay(
+                safeRunnable, initialDelay, (long) period * MILLIS_PER_TICK, TimeUnit.MILLISECONDS
+            );
+        final Task task = new Task(future);
+        if (period != 0) {
+            this.tasks.put(this.taskIdCounter.incrementAndGet(), task);
+        }
         return task;
     }
 
@@ -23,10 +59,13 @@ public class TaskScheduler {
     }
 
     public void cancelTask(int taskId) {
-        if (this.tasks.containsKey(taskId)) {
-            final Task task = this.tasks.get(taskId);
+        final Task task = this.tasks.remove(taskId);
+        if (task != null) {
             task.cancel();
-            this.tasks.remove(taskId);
         }
+    }
+
+    public void shutdown() {
+        this.executor.shutdownNow();
     }
 }

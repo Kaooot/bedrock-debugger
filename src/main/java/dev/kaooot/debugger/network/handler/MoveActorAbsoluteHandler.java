@@ -1,8 +1,5 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.math.vector.Vector3f;
-import org.cloudburstmc.protocol.bedrock.packet.MoveActorAbsolutePacket;
-import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.actor.Actor;
 import dev.kaooot.debugger.config.ConfigRegistry;
@@ -11,6 +8,9 @@ import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
 import dev.kaooot.debugger.network.PacketHandler;
 import dev.kaooot.debugger.player.ServerPlayer;
+import org.cloudburstmc.math.vector.Vector3f;
+import org.cloudburstmc.protocol.bedrock.packet.MoveActorAbsolutePacket;
+import org.cloudburstmc.protocol.common.PacketSignal;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -39,7 +39,7 @@ public class MoveActorAbsoluteHandler implements PacketHandler<MoveActorAbsolute
             if (player.getRuntimeId() == packet.getMoveData().getActorRuntimeID() &&
                 player.getActorId() != proxy.getPlayer().getActorId()) {
                 final Vector3f position = packet.getMoveData().getPos().clone()
-                    .sub(0f, player.getEyeHeight(), 0f);
+                    .sub(0f, ServerPlayer.EYE_HEIGHT, 0f);
                 player.setPosition(position);
                 break;
             }

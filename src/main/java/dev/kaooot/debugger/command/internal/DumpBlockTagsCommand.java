@@ -12,9 +12,9 @@ import dev.kaooot.debugger.util.DebugServerHelper;
  *
  * @author Kaooot
  */
-@Name("generateitemtags")
-@Description("Outputs valid item tags in a json format.")
-public class GenerateItemTagsCommand extends GenerateCommand {
+@Name("dumpblocktags")
+@Description("Outputs valid block tags in a json format.")
+public class DumpBlockTagsCommand extends AdvancedDumpCommand {
 
     private boolean flag;
 
@@ -25,7 +25,7 @@ public class GenerateItemTagsCommand extends GenerateCommand {
             return;
         }
         this.flag = true;
-        final String fileName = "item_tags";
+        final String fileName = "block_tags";
         final File file = new File(proxy.getDataFolder() + "/logs/" + fileName + ".json");
         final DebugServerHelper helper = new DebugServerHelper(proxy);
         helper.startDebugServer().whenComplete((result, throwable) -> {
@@ -35,9 +35,9 @@ public class GenerateItemTagsCommand extends GenerateCommand {
                 return;
             }
 
-            proxy.getDebugHttpServer().addListener(DebugHttpServer.ListenerType.ITEM_TAGS,
-                itemTags -> {
-                    this.saveJsonFile(file, itemTags, proxy);
+            proxy.getDebugHttpServer().addListener(DebugHttpServer.ListenerType.BLOCK_TAGS,
+                blockTags -> {
+                    this.saveJsonFile(file, blockTags, proxy);
 
                     helper.stopDebugServer();
 

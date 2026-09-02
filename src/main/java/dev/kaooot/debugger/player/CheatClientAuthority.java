@@ -6,12 +6,14 @@ import org.cloudburstmc.math.vector.Vector3i;
 import org.cloudburstmc.protocol.bedrock.data.AbilitiesIndex;
 import org.cloudburstmc.protocol.bedrock.data.PlayerActionType;
 import org.cloudburstmc.protocol.bedrock.data.PlayerBlockActionData;
+import org.cloudburstmc.protocol.bedrock.data.map.MapPixel;
 import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedAbilitiesData;
 import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedAbilitiesDataSerializedLayer;
 import org.cloudburstmc.protocol.bedrock.data.payload.inventory.transaction.ItemUseOnActorActionType;
 import org.cloudburstmc.protocol.bedrock.data.payload.inventory.transaction.data.InventoryTransactionDataType;
 import org.cloudburstmc.protocol.bedrock.data.payload.inventory.transaction.data.ItemUseOnActorInventoryTransaction;
 import org.cloudburstmc.protocol.bedrock.packet.InventoryTransactionPacket;
+import org.cloudburstmc.protocol.bedrock.packet.MapInfoRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerActionPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerAuthInputPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateAbilitiesPacket;
@@ -24,6 +26,10 @@ import dev.kaooot.debugger.BedrockDebuggerProxy;
  */
 @RequiredArgsConstructor
 public class CheatClientAuthority {
+
+    private static final float ENHANCED_FLY_SPEED_VALUE = 0.1f;
+    private static final float DEFAULT_WALK_SPEED = 0.1f;
+    private static final float DEFAULT_FLY_SPEED = 0.05f;
 
     private final BedrockDebuggerProxy proxy;
     private final ProxiedPlayer player;
@@ -39,7 +45,7 @@ public class CheatClientAuthority {
     public void updateMineAbility() {
         final boolean enabled = this.settings.isForceMineAbilityEnabled();
         final UpdateAbilitiesPacket updateAbilitiesPacket = new UpdateAbilitiesPacket();
-        final SerializedAbilitiesData data = this.player.serializedAbilitiesData;
+        final SerializedAbilitiesData data = this.player.getSerializedAbilitiesData();
         if (enabled) {
             for (final SerializedAbilitiesDataSerializedLayer layer : data.getLayers()) {
                 layer.getAbilityValues().add(AbilitiesIndex.MINE);
@@ -68,7 +74,9 @@ public class CheatClientAuthority {
                     startDestroyAction.setBlockPosition(posOffset);
 
                     final PlayerBlockActionData predictDestroyAction = new PlayerBlockActionData();
-                    predictDestroyAction.setPlayerActionType(PlayerActionType.PREDICT_DESTROY_BLOCK);
+                    predictDestroyAction.setPlayerActionType(
+                        PlayerActionType.PREDICT_DESTROY_BLOCK
+                    );
                     predictDestroyAction.setBlockPosition(posOffset);
 
                     packet.getPlayerBlockActions().add(startDestroyAction);
@@ -96,5 +104,49 @@ public class CheatClientAuthority {
             this.proxy.getClient().sendPacket(packet);
         }
         return true;
+    }
+
+    public void updateEnhancedFlySpeed() {
+        this.player.sendMessage(
+            (this.settings.isEnhancedFlySpeedEnabled() ? "Enabled" : "Disabled") +
+                " Enhanced Fly Speed"
+        );
+
+        final UpdateAbilitiesPacket updateAbilitiesPacket = new UpdateAbilitiesPacket();
+        final SerializedAbilitiesData data = this.player.getSerializedAbilitiesData();
+        for (final SerializedAbilitiesDataSerializedLayer layer : data.getLayers()) {
+            layer.getAbilityValues().add(AbilitiesIndex.FLYING);
+            layer.setFlySpeed(
+                this.settings.isEnhancedFlySpeedEnabled() ? ENHANCED_FLY_SPEED_VALUE :
+                    DEFAULT_FLY_SPEED
+            );
+        }
+        updateAbilitiesPacket.setData(data);
+        this.proxy.getServer().sendPacket(updateAbilitiesPacket);
+    }
+
+    public void handleEnhancedFlySpeed(UpdateAbilitiesPacket packet) {
+        if (packet.getData().getTargetPlayerRawId() != this.player.getActorId()) {
+            return;
+        }
+        this.player.setSerializedAbilitiesData(packet.getData());
+        if (!this.settings.isEnhancedFlySpeedEnabled()) {
+            return;
+        }
+        final SerializedAbilitiesData data = packet.getData();
+        for (final SerializedAbilitiesDataSerializedLayer layer : data.getLayers()) {
+            layer.setFlySpeed(ENHANCED_FLY_SPEED_VALUE);
+        }
+    }
+
+    public void sendBadPacket() {
+        final MapInfoRequestPacket packet = new MapInfoRequestPacket();
+        packet.setMapUniqueID(0L);
+        for (int i = 0; i < 65000; i++) {
+            packet.getClientPixelsList().add(new MapPixel(0, i));
+        }
+
+        this.proxy.getClient().sendPacket(packet);
+        this.proxy.getPlayer().sendMessage("Sent bad packet");
     }
 }
