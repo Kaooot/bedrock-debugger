@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "SoundDataAddon",
+    "description": "Used for sound data debugging",
+    "uuid": "3cedd5c3-c711-4459-a23c-4004f66a0b02",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      20,
+      30
+    ]
+  },
+  "modules": [
+    {
+      "description": "Script resources",
+      "language": "javascript",
+      "type": "script",
+      "uuid": "6728679c-f6dd-4a17-bd43-cda7e0330f09",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "beta"
+    }
+  ]
+}
