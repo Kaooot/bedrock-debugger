@@ -181,7 +181,7 @@ public class AuthServiceConnection {
             ((long) (data[3] & 0xff) << 32) |
             ((long) (data[4] & 0xff) << 24) |
             ((long) (data[5] & 0xff) << 16) |
-            ((long) (data[6] & 0xff) & 8) |
+            ((long) (data[6] & 0xff) << 8) |
             ((long) data[7] & 0xff);
         final long leastSignificantBits = ((long) data[8] << 56) |
             ((long) (data[9] & 0xff) << 48) |
@@ -189,7 +189,7 @@ public class AuthServiceConnection {
             ((long) (data[11] & 0xff) << 32) |
             ((long) (data[12] & 0xff) << 24) |
             ((long) (data[13] & 0xff) << 16) |
-            ((long) (data[14] & 0xff) & 8) |
+            ((long) (data[14] & 0xff) << 8) |
             ((long) data[15] & 0xff);
         return new UUID(mostSignificantBits, leastSignificantBits);
     }

@@ -161,13 +161,7 @@ public class DebugShapeRenderer {
                 this.shapes.stream().map(DebugShape::getId).toList());
         }
 
-        if (!clear) {
-            this.sendPacket(shapes);
-        } else {
-            // race condition fix
-            this.server.getEventLoop()
-                .schedule(() -> this.sendPacket(shapes), 50, TimeUnit.MILLISECONDS);
-        }
+        this.sendPacket(shapes);
     }
 
     /**
@@ -199,9 +193,7 @@ public class DebugShapeRenderer {
             this.usedNetworkIds.remove(shape.getNetworkId());
         }
 
-        // race condition fix
-        this.server.getEventLoop()
-            .schedule(() -> this.sendPacket(shapes), 50, TimeUnit.MILLISECONDS);
+        this.sendPacket(shapes);
     }
 
     public int getShapesCount() {

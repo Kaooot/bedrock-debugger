@@ -1142,7 +1142,9 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
                 GeneratorType.LEGACY,
                 DimensionType.from(Dimension.OVERWORLD),
                 new UUID(0L, 0L),
-                "minecraft:ocean"
+                "minecraft:ocean",
+                192,
+                true
             )
         );
         proxy.getServer().sendPacket(packet);

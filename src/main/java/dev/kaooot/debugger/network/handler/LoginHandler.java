@@ -119,6 +119,8 @@ public class LoginHandler implements PacketHandler<LoginPacket> {
                     .add(new SimpleItemDefinition("minecraft:empty", 0, false))
                     .build();
 
+            proxy.awaitAssetsLoaded();
+
             proxy.getClient().setBlockDefinitions(proxy.getBlockDefinitionRegistry());
             proxy.getServer().setBlockDefinitions(proxy.getBlockDefinitionRegistry());
             proxy.getClient().setItemDefinitions(itemDefinitionRegistry);
