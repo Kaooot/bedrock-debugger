@@ -67,17 +67,31 @@ public class HttpRequest<R> {
 
             final int code = connection.getResponseCode();
             final String message = connection.getResponseMessage();
+            final boolean error = code < 200 || code >= 300;
 
-            if (code != 200) {
-                throw new IllegalStateException("Received code: " + code + " " + message);
+            final InputStream stream = error ? connection.getErrorStream() :
+                connection.getInputStream();
+            String data = "";
+            if (stream != null) {
+                try (stream) {
+                    data = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+                }
             }
 
-            final R result;
-            try (final InputStream inputStream = connection.getInputStream()) {
-                final String data = new String(inputStream.readAllBytes());
-                result = this.proxy.getGson().fromJson(data, clazz);
+            if (error) {
+                this.proxy.getLogger().error(
+                    "A http request to {} failed with code {} {}: {}",
+                    this.url,
+                    code,
+                    message,
+                    data
+                );
+                connection.disconnect();
+                System.exit(0);
+                return null;
             }
 
+            final R result = this.proxy.getGson().fromJson(data, clazz);
             connection.disconnect();
             return result;
         } catch (IOException e) {

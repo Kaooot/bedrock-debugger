@@ -1,11 +1,11 @@
 package dev.kaooot.debugger.config;
 
+import dev.kaooot.debugger.api.config.Config;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
-import dev.kaooot.debugger.api.config.Config;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -28,9 +28,10 @@ public class AccountsConfig extends Config {
         return new AccountsConfig();
     }
 
-    @Value
+    @Data
+    @AllArgsConstructor
     public static class AccountDetails {
-        String name;
-        String refreshToken;
+        private String name;
+        private  String refreshToken;
     }
 }
