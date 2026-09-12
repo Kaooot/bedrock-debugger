@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.cloudburstmc.protocol.bedrock.util.EncryptionUtils;
 import org.cloudburstmc.protocol.common.util.Preconditions;
 
@@ -120,8 +122,10 @@ public class BedrockDebuggerProxy {
         final ConfigRegistry configRegistry = Registries.getRegistry(RegistryKey.CONFIG);
         final MainConfig config = configRegistry.get(MainConfig.class);
         final AccountsConfig accountsConfig = configRegistry.get(AccountsConfig.class);
+        final SettingsConfig settingsConfig = configRegistry.get(SettingsConfig.class);
 
-        this.loadPacks = configRegistry.get(SettingsConfig.class).isLoadPacks();
+        this.updateLogLevel(settingsConfig);
+        this.loadPacks = settingsConfig.isLoadPacks();
         this.packManager = new PackManager();
         this.blockPaletteManager = new BlockPaletteManager(this);
         this.assetLoadFuture = CompletableFuture.runAsync(() -> {
@@ -214,6 +218,10 @@ public class BedrockDebuggerProxy {
 
     public void awaitAssetsLoaded() {
         this.assetLoadFuture.join();
+    }
+
+    public void updateLogLevel(SettingsConfig settingsConfig) {
+        Configurator.setRootLevel(Level.getLevel(settingsConfig.getLogLevel()));
     }
 
     private void shutdownIfDisconnected() {

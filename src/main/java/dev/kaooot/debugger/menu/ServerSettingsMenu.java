@@ -5,6 +5,7 @@ import dev.kaooot.debugger.actor.Actor;
 import dev.kaooot.debugger.api.forms.CustomForm;
 import dev.kaooot.debugger.api.forms.FormListener;
 import dev.kaooot.debugger.api.forms.element.Divider;
+import dev.kaooot.debugger.api.forms.element.Dropdown;
 import dev.kaooot.debugger.api.forms.element.Element;
 import dev.kaooot.debugger.api.forms.element.Header;
 import dev.kaooot.debugger.api.forms.element.Input;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.apache.logging.log4j.Level;
 import org.cloudburstmc.protocol.bedrock.data.PlatformType;
 
 /**
@@ -174,6 +176,16 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         zoneIdOverrideInput.setTooltip(
             "Overrides the Zone ID for the Local time displayed in the build info"
         );
+
+        final Dropdown logLevelDropdown = new Dropdown();
+        logLevelDropdown.setId("dropdown_logLevel");
+        for (final Level value : Level.values()) {
+            logLevelDropdown.addOption(
+                value.name(),
+                settingsConfig.getLogLevel().equals(value.name())
+            );
+        }
+        logLevelDropdown.setText("Log Level");
 
         final Label playerDebugRendererLabel = new Label();
         playerDebugRendererLabel.setId("label-player_debug_renderer");
@@ -326,6 +338,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 cnsScreenMinPacketNumInput,
                 platformTypeSlider,
                 zoneIdOverrideInput,
+                logLevelDropdown,
                 divider,
                 playerDebugRendererLabel,
                 playerDebugRendererToggle, playerDebugRendererColorRInput,
@@ -557,6 +570,13 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         } catch (Throwable e) {
             proxy.getPlayer().sendMessage("§cInvalid Zone ID");
             return;
+        }
+
+        final String logLevelResponse = response.getDropdownResponse("dropdown_logLevel");
+        if (!settingsConfig.getLogLevel().equals(logLevelResponse)) {
+            settingsConfig.setLogLevel(logLevelResponse);
+            proxy.updateLogLevel(settingsConfig);
+            proxy.getPlayer().sendMessage("Set Log Level to " + logLevelResponse);
         }
 
         this.updateToggle(

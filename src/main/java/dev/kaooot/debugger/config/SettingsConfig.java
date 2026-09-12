@@ -79,6 +79,8 @@ public class SettingsConfig extends Config {
     private String zoneIdOverride = "";
     @SerializedName("platform_type")
     private PlatformType platformType = PlatformType.MOBILE;
+    @SerializedName("log_level")
+    private String logLevel = "INFO";
 
     @Override
     public String getName() {

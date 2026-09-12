@@ -1,5 +1,17 @@
 package dev.kaooot.debugger.command.internal;
 
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.api.command.Command;
+import dev.kaooot.debugger.api.command.annotation.CommandEnumValue;
+import dev.kaooot.debugger.api.command.annotation.Description;
+import dev.kaooot.debugger.api.command.annotation.Name;
+import dev.kaooot.debugger.api.command.annotation.Overloads;
+import dev.kaooot.debugger.api.command.annotation.Parameter;
+import dev.kaooot.debugger.api.command.annotation.Parameters;
+import dev.kaooot.debugger.config.ConfigRegistry;
+import dev.kaooot.debugger.config.TestConfig;
+import dev.kaooot.debugger.core.registry.Registries;
+import dev.kaooot.debugger.core.registry.RegistryKey;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,9 +67,6 @@ import org.cloudburstmc.protocol.bedrock.data.actor.ActorEvent;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorLink;
 import org.cloudburstmc.protocol.bedrock.data.camera.AimAssistAction;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraFadeInstruction;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraSetInstruction;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraTargetInstruction;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandEnumData;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandOriginData;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandOriginType;
@@ -128,7 +137,6 @@ import org.cloudburstmc.protocol.bedrock.packet.BlockPickRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.BookEditPacket;
 import org.cloudburstmc.protocol.bedrock.packet.BossEventPacket;
 import org.cloudburstmc.protocol.bedrock.packet.CameraAimAssistPacket;
-import org.cloudburstmc.protocol.bedrock.packet.CameraInstructionPacket;
 import org.cloudburstmc.protocol.bedrock.packet.CameraPacket;
 import org.cloudburstmc.protocol.bedrock.packet.CameraShakePacket;
 import org.cloudburstmc.protocol.bedrock.packet.ChangeDimensionPacket;
@@ -257,18 +265,6 @@ import org.cloudburstmc.protocol.bedrock.packet.UpdateSoftEnumPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateSubChunkBlocksPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateTradePacket;
 import org.cloudburstmc.protocol.common.util.OptionalBoolean;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.api.command.Command;
-import dev.kaooot.debugger.api.command.annotation.CommandEnumValue;
-import dev.kaooot.debugger.api.command.annotation.Description;
-import dev.kaooot.debugger.api.command.annotation.Name;
-import dev.kaooot.debugger.api.command.annotation.Overloads;
-import dev.kaooot.debugger.api.command.annotation.Parameter;
-import dev.kaooot.debugger.api.command.annotation.Parameters;
-import dev.kaooot.debugger.config.ConfigRegistry;
-import dev.kaooot.debugger.config.TestConfig;
-import dev.kaooot.debugger.core.registry.Registries;
-import dev.kaooot.debugger.core.registry.RegistryKey;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -406,7 +402,6 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
             this.testGameTestResults(proxy);
             this.testUpdateClientInputLocks(proxy);
             this.testUnlockedRecipes(proxy);
-            this.testCameraInstruction(proxy);
             this.testNetworkStackLatency(proxy);
             this.testMobEquipment(proxy);
             this.testMobArmorEquipment(proxy);
@@ -1223,33 +1218,6 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setType(UnlockedRecipesPacket.UnlockedRecipesPacketType.REMOVE_ALL);
         packet.getUnlockedRecipesList().add("minecraft:acacia_button");
         proxy.getServer().sendPacket(packet);
-    }
-
-    private void testCameraInstruction(BedrockDebuggerProxy proxy) {
-        final CameraSetInstruction setInstruction = new CameraSetInstruction();
-        setInstruction.setPreset(proxy.getServer().getCameraPresetDefinitions().getDefinition(0));
-
-        final CameraFadeInstruction fadeInstruction = new CameraFadeInstruction();
-        fadeInstruction.setTime(new CameraFadeInstruction.TimeOption(1f, 1f, 1f));
-        fadeInstruction.setColor(new CameraFadeInstruction.ColorOption(Color.YELLOW.getRed(),
-            Color.YELLOW.getGreen(), Color.YELLOW.getBlue()));
-
-        final CameraTargetInstruction targetInstruction = new CameraTargetInstruction();
-        targetInstruction.setTargetCenterOffset(Vector3f.ZERO);
-        targetInstruction.setTargetActorID(proxy.getPlayer().getActorId());
-
-        final CameraInstructionPacket packet = new CameraInstructionPacket();
-        packet.setSetInstruction(setInstruction);
-
-        proxy.getServer().sendPacket(packet);
-
-        /*final CameraInstructionPacket pk0 = new CameraInstructionPacket();
-        pk0.setFadeInstruction(fadeInstruction);
-        proxy.getServer().sendPacket(pk0);*/
-
-        /*final CameraInstructionPacket pk0 = new CameraInstructionPacket();
-        pk0.setTargetInstruction(targetInstruction);
-        proxy.getServer().sendPacket(pk0);*/
     }
 
     private void testNetworkStackLatency(BedrockDebuggerProxy proxy) {
