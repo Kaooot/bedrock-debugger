@@ -1,7 +1,11 @@
 package dev.kaooot.debugger.server;
 
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.network.NetworkConstants;
+import dev.kaooot.debugger.network.ProxiedPacketHandler;
+import dev.kaooot.debugger.util.DebugElement;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoop;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
@@ -26,10 +30,6 @@ import org.cloudburstmc.protocol.bedrock.packet.SetTitlePacket;
 import org.cloudburstmc.protocol.common.DefinitionRegistry;
 import org.cloudburstmc.protocol.common.NamedDefinition;
 import org.cloudburstmc.protocol.common.SimpleDefinitionRegistry;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.network.NetworkConstants;
-import dev.kaooot.debugger.network.ProxiedPacketHandler;
-import dev.kaooot.debugger.util.DebugElement;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -65,7 +65,7 @@ public class ProxiedServer {
             .ipv6Port(this.address.getPort());
 
         final ServerBootstrap bootstrap = new ServerBootstrap();
-        final Channel channel = bootstrap
+        final ChannelFuture channelFuture = bootstrap
             .channelFactory(RakChannelFactory.server(NioDatagramChannel.class))
             .option(RakChannelOption.RAK_ADVERTISEMENT, pong.toByteBuf())
             .group(new NioEventLoopGroup())
@@ -90,11 +90,23 @@ public class ProxiedServer {
                 }
             })
             .bind(this.address)
-            .syncUninterruptibly()
-            .channel();
-        channel.pipeline().remove(RakServerRateLimiter.class);
-
-        this.proxy.getLogger().info("Bedrock server started on {}", this.address);
+            .awaitUninterruptibly();
+        channelFuture.addListener(future -> {
+            if (!future.isSuccess()) {
+                final Throwable throwable = future.cause();
+                if (throwable != null) {
+                    this.proxy.getLogger().error(
+                        "Failed to start the proxied server on {}: {}",
+                        this.address,
+                        throwable.getMessage()
+                    );
+                    System.exit(0);
+                }
+            } else {
+                this.proxy.getLogger().info("Bedrock server started on {}", this.address);
+            }
+        });
+        channelFuture.channel().pipeline().remove(RakServerRateLimiter.class);
     }
 
     public void sendPacket(BedrockPacket packet) {

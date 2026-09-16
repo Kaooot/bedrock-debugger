@@ -34,7 +34,8 @@ public class MsaAuth {
     private final BedrockDebuggerProxy proxy;
 
     public void doPrompt(AccountsConfig config, MainConfig mainConfig) {
-        if (mainConfig.getAccountName() == null || mainConfig.getAccountName().isEmpty()) {
+        final String accountName = mainConfig.getAccountName();
+        if (accountName == null || accountName.isEmpty()) {
             final DeviceCodeRequest.Result result = DeviceCodeRequest.builder()
                 .build()
                 .make();
@@ -61,14 +62,15 @@ public class MsaAuth {
         } else {
             String refreshToken = null;
             for (final AccountsConfig.AccountDetails account : config.getAccounts()) {
-                if (account.getName().equalsIgnoreCase(mainConfig.getAccountName())) {
+                if (account.getName().equalsIgnoreCase(accountName)) {
                     refreshToken = account.getRefreshToken();
                 }
             }
             if (refreshToken == null) {
-                throw new IllegalStateException(
+                this.proxy.getLogger().error(
                     "The provided account name was not found in the accounts configuration"
                 );
+                return;
             }
 
             final AccessTokenRefreshRequest.Result result = AccessTokenRefreshRequest.builder()
@@ -78,6 +80,17 @@ public class MsaAuth {
 
             this.accessToken = result.getAccessToken();
             this.proxy.getLogger().info("Authentication using stored refresh token was successful");
+
+            config.getAccounts().stream()
+                .filter(accountDetails -> accountDetails.getName().equalsIgnoreCase(accountName))
+                .findAny()
+                .ifPresent(accountDetails -> {
+                    accountDetails.setRefreshToken(result.getRefreshToken());
+
+                    Registries.<ConfigRegistry>getRegistry(RegistryKey.CONFIG).save(config);
+
+                    this.proxy.getLogger().info("The refresh token has been updated");
+                });
         }
     }
 

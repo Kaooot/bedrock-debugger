@@ -36,23 +36,9 @@ Contributions and pull requests are not accepted.
 
 1. Place `pack.zip` in the `resource_packs` folder. The pack can be found in `resources/pack`.
 2. Open [microsoft.com/link](https://microsoft.com/link) and enter the code displayed in the command line.
-3. Log in to your Microsoft account.
-4. If the program has not created a default account, open `data/accounts.json` and enter the refresh token displayed
-   in the command line.
-
-```json
-{
-  "accounts": [
-    {
-      "name": "NAME",
-      "refreshToken": "TOKEN"
-    }
-  ]
-}
-```
-
-* Configure the remote (target) and local server (proxied). For example, the following configuration starts a
-  local proxied server on port 19122 and connects to a localhost server on port 19132:
+3. Log in to your Microsoft account. DO NOT disclose your account details to third parties!
+4. Configure the remote (target) and local server (proxied). For example, the following configuration starts a local
+  proxied server on port 19122 and connects to a localhost server on port 19132:
 
 ```json
 {
@@ -65,3 +51,16 @@ Contributions and pull requests are not accepted.
   "experience_id": "EXPERIENCE ID"// if connection type is EXPERIENCE
 }
 ```
+
+> **Keep `data/accounts.json` private.** The refresh token stored there grants access to your Microsoft account — treat
+> it like a password. Never share it, post it in logs or screenshots, or commit it to a repository. Anyone who obtains
+> it can sign in as you.
+>
+> You are solely responsible for safeguarding this file and its contents. The author accepts no responsibility or
+> liability for any account loss, compromise, or other damage resulting from misuse or careless handling of
+> `data/accounts.json`.
+
+## Troubleshooting
+
+* You may need to enable loopback access when connecting to a local server,
+  see https://github.com/microsoft/MinecraftCodex/blob/main/package.json#L14
