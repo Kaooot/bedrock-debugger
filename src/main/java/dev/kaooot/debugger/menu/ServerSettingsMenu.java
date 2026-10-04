@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.Level;
-import org.cloudburstmc.protocol.bedrock.data.PlatformType;
+import org.cloudburstmc.protocol.bedrock.data.connection.PlatformType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

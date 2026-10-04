@@ -1,13 +1,13 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraPreset;
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.network.PacketHandler;
+import dev.kaooot.debugger.util.Util;
+import org.cloudburstmc.protocol.bedrock.data.camera.CameraPresets;
 import org.cloudburstmc.protocol.bedrock.packet.CameraPresetsPacket;
 import org.cloudburstmc.protocol.common.NamedDefinition;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import org.cloudburstmc.protocol.common.SimpleDefinitionRegistry;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.network.PacketHandler;
-import dev.kaooot.debugger.util.Util;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -25,7 +25,7 @@ public class CameraPresetsHandler implements PacketHandler<CameraPresetsPacket> 
         );
         final SimpleDefinitionRegistry.Builder<NamedDefinition> registry =
             new SimpleDefinitionRegistry.Builder<>();
-        for (final CameraPreset preset : packet.getCameraPresets()) {
+        for (final CameraPresets preset : packet.getCameraPresets()) {
             registry.add(new NamedDefinition() {
                 @Override
                 public String getIdentifier() {

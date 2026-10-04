@@ -14,7 +14,7 @@ public class UpdateClientOptionsHandler implements PacketHandler<UpdateClientOpt
 
     @Override
     public PacketSignal handle(UpdateClientOptionsPacket packet, BedrockDebuggerProxy proxy) {
-        proxy.getPlayer().setGraphicsMode(packet.getGraphicsMode());
+        proxy.getPlayer().setGraphicsMode(packet.getGraphicsModeChange());
         return PacketSignal.UNHANDLED;
     }
 }

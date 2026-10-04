@@ -14,7 +14,7 @@ public class ChangeDimensionHandler implements PacketHandler<ChangeDimensionPack
 
     @Override
     public PacketSignal handle(ChangeDimensionPacket packet, BedrockDebuggerProxy proxy) {
-        proxy.getPlayer().updateDimension(packet.getDimension());
+        proxy.getPlayer().updateDimension(packet.getDimensionID());
         proxy.getPlayer().getPlayerChunkManager().clearChunks();
         return PacketSignal.UNHANDLED;
     }

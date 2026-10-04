@@ -22,7 +22,7 @@ public class GammaCommand extends Command<BedrockDebuggerProxy> {
         if (toggled) {
             final MobEffectPacket packet = new MobEffectPacket();
             packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
-            packet.setEvent(MobEffectPacket.Event.ADD);
+            packet.setEventID(MobEffectPacket.Event.ADD);
             packet.setEffectID(16);
             packet.setEffectDurationTicks(Integer.MAX_VALUE);
             proxy.getServer().sendPacket(packet);
@@ -31,7 +31,7 @@ public class GammaCommand extends Command<BedrockDebuggerProxy> {
         } else {
             final MobEffectPacket packet = new MobEffectPacket();
             packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
-            packet.setEvent(MobEffectPacket.Event.REMOVE);
+            packet.setEventID(MobEffectPacket.Event.REMOVE);
             packet.setEffectID(16);
             proxy.getServer().sendPacket(packet);
 

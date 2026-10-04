@@ -21,11 +21,11 @@ public class CameraAimAssistPresetsHandler implements PacketHandler<CameraAimAss
             NbtMap.builder()
                 .putList("categories",
                     NbtType.COMPOUND,
-                    Util.convertCameraAimAssistCategoriesToNbt(packet.getCategoryDefinitions())
+                    Util.convertCameraAimAssistCategoriesToNbt(packet.getCameraAimAssistCategories())
                 )
                 .putList("presets",
                     NbtType.COMPOUND,
-                    Util.convertCameraAimAssistPresetsToNbt(packet.getPresets())
+                    Util.convertCameraAimAssistPresetsToNbt(packet.getCameraAimAssistPresets())
                 )
                 .build()
         );

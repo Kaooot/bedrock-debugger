@@ -182,13 +182,8 @@ public class BedrockDebuggerProxy {
         this.remoteAddress = address;
         this.remotePort = port;
         final ProxiedClient client = new ProxiedClient(new InetSocketAddress(address, port), this);
-        try {
-            client.start();
-            this.client = client;
-        } catch (Exception e) {
-            this.logger.error("Could not connect to the remote server: " + e.getMessage());
-            System.exit(0);
-        }
+        client.start();
+        this.client = client;
     }
 
     public void connect(MainConfig config) {

@@ -1,6 +1,12 @@
 package dev.kaooot.debugger.util;
 
 import com.sun.jna.platform.win32.WinDef;
+import dev.kaooot.debugger.BedrockDebuggerProxy;
+import dev.kaooot.debugger.config.SettingsConfig;
+import dev.kaooot.debugger.core.registry.Registries;
+import dev.kaooot.debugger.core.registry.RegistryKey;
+import dev.kaooot.debugger.screen.DebugScreen;
+import dev.kaooot.debugger.screen.DebugScreenRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.IOException;
@@ -16,14 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.cloudburstmc.math.vector.Vector2i;
-import org.cloudburstmc.protocol.bedrock.data.GraphicsMode;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
-import dev.kaooot.debugger.config.ConfigRegistry;
-import dev.kaooot.debugger.config.SettingsConfig;
-import dev.kaooot.debugger.core.registry.Registries;
-import dev.kaooot.debugger.core.registry.RegistryKey;
-import dev.kaooot.debugger.screen.DebugScreen;
-import dev.kaooot.debugger.screen.DebugScreenRegistry;
+import org.cloudburstmc.protocol.bedrock.data.connection.GraphicsMode;
 import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
 import oshi.hardware.HardwareAbstractionLayer;

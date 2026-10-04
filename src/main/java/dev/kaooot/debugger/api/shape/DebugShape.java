@@ -6,11 +6,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.cloudburstmc.math.vector.Vector3f;
-import org.cloudburstmc.protocol.bedrock.data.Dimension;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.ExtraShapeDataPayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.PrimitiveShapeDataPayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.data.shape.PrimitiveShapeDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.data.world.Dimension;
+import org.cloudburstmc.protocol.bedrock.data.world.DimensionType;
 import org.cloudburstmc.protocol.common.util.Preconditions;
 
 /**
@@ -19,7 +18,7 @@ import org.cloudburstmc.protocol.common.util.Preconditions;
  * @author Kaooot
  */
 @Data
-public abstract class DebugShape<T extends ExtraShapeDataPayload> {
+public abstract class DebugShape<T> {
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)

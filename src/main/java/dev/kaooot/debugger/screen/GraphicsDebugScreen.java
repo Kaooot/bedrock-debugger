@@ -5,7 +5,7 @@ import dev.kaooot.debugger.util.DebugElement;
 import dev.kaooot.debugger.util.Util;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
-import org.cloudburstmc.protocol.bedrock.data.payload.pack.PackInstanceId;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.PackInstanceId;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

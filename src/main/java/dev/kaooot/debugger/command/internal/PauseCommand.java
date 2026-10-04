@@ -1,6 +1,6 @@
 package dev.kaooot.debugger.command.internal;
 
-import org.cloudburstmc.protocol.bedrock.data.LevelEvent;
+import org.cloudburstmc.protocol.bedrock.data.world.event.LevelEvent;
 import org.cloudburstmc.protocol.bedrock.packet.LevelEventPacket;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.api.command.Command;
@@ -21,7 +21,7 @@ public class PauseCommand extends Command<BedrockDebuggerProxy> {
         proxy.getPlayer().setPaused(!proxy.getPlayer().isPaused());
 
         final LevelEventPacket packet = new LevelEventPacket();
-        packet.setType(LevelEvent.GLOBAL_PAUSE);
+        packet.setEventId(LevelEvent.GLOBAL_PAUSE);
         packet.setPosition(proxy.getPlayer().getPosition());
         packet.setData(proxy.getPlayer().isPaused() ? (byte) 1 : (byte) 0);
         proxy.getServer().sendPacket(packet);

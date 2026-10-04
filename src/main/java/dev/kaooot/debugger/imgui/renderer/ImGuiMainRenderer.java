@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import org.cloudburstmc.math.vector.Vector3i;
-import org.cloudburstmc.protocol.bedrock.data.payload.skin.PieceType;
-import org.cloudburstmc.protocol.bedrock.data.payload.skin.SerializedPersonaPieceHandle;
-import org.cloudburstmc.protocol.bedrock.data.payload.skin.SerializedSkin;
-import org.cloudburstmc.protocol.bedrock.data.payload.skin.TintMapColor;
+import org.cloudburstmc.protocol.bedrock.data.skin.PieceType;
+import org.cloudburstmc.protocol.bedrock.data.skin.SerializedPersonaPieceHandle;
+import org.cloudburstmc.protocol.bedrock.data.skin.SerializedSkin;
+import org.cloudburstmc.protocol.bedrock.data.skin.TintMapColor;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -423,7 +423,8 @@ public class ImGuiMainRenderer implements ImGuiRenderer {
                                     ImGui.sameLine();
                                 }
                                 this.colorSwatch(
-                                    "##tint_" + entry.getKey().getId() + "_" + i, colors.get(i)
+                                    "##tint_" + entry.getKey().getId() + "_" + i,
+                                    colors.get(i)
                                 );
                             }
                         }

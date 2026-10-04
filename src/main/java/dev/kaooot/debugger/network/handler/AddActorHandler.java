@@ -1,8 +1,5 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.payload.attribute.AttributeData;
-import org.cloudburstmc.protocol.bedrock.packet.AddActorPacket;
-import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.actor.Actor;
 import dev.kaooot.debugger.config.ConfigRegistry;
@@ -10,6 +7,9 @@ import dev.kaooot.debugger.config.SettingsConfig;
 import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
 import dev.kaooot.debugger.network.PacketHandler;
+import org.cloudburstmc.protocol.bedrock.data.actor.attribute.SyncedAttribute;
+import org.cloudburstmc.protocol.bedrock.packet.AddActorPacket;
+import org.cloudburstmc.protocol.common.PacketSignal;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -32,10 +32,10 @@ public class AddActorHandler implements PacketHandler<AddActorPacket> {
             actor.setLink(packet.getActorLinks().getFirst());
         }
         actor.setMetadata(packet.getActorData());
-        for (final AttributeData attributeData : packet.getAttributesList()) {
-            if (attributeData.getAttributeName().equalsIgnoreCase("minecraft:health")) {
-                actor.setHealth(attributeData.getCurrentValue());
-                actor.setMaxHealth(attributeData.getMaxValue());
+        for (final SyncedAttribute syncedAttribute : packet.getAttributesList()) {
+            if (syncedAttribute.getAttributeName().equalsIgnoreCase("minecraft:health")) {
+                actor.setHealth(syncedAttribute.getCurrentValue());
+                actor.setMaxHealth(syncedAttribute.getMaxValue());
             }
         }
 

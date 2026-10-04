@@ -1,6 +1,6 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.PlayStatus;
+import org.cloudburstmc.protocol.bedrock.data.player.PlayStatus;
 import org.cloudburstmc.protocol.bedrock.packet.PlayStatusPacket;
 import org.cloudburstmc.protocol.bedrock.packet.RequestNetworkSettingsPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;

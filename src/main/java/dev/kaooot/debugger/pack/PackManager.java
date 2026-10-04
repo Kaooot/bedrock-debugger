@@ -21,8 +21,8 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import lombok.Getter;
-import org.cloudburstmc.protocol.bedrock.data.PackType;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.PackType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

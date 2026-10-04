@@ -36,10 +36,20 @@
             <version>1.18.46</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.github.Kaooot</groupId>
             <artifactId>Protocol</artifactId>
             <version>3.0-SNAPSHOT</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.cloudburstmc.protocol</groupId>
+            <artifactId>bedrock-codec</artifactId>
+            <version>3.0.0.Beta13-Debug-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cloudburstmc.protocol</groupId>
+            <artifactId>bedrock-connection</artifactId>
+            <version>3.0.0.Beta13-Debug-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>

@@ -20,13 +20,16 @@ import org.cloudburstmc.protocol.bedrock.data.inventory.descriptor.ItemDescripto
 import org.cloudburstmc.protocol.bedrock.data.inventory.descriptor.ItemTagDescriptor;
 import org.cloudburstmc.protocol.bedrock.data.inventory.descriptor.MolangDescriptor;
 import org.cloudburstmc.protocol.bedrock.data.inventory.descriptor.NameDescriptor;
-import org.cloudburstmc.protocol.bedrock.data.inventory.descriptor.RecipeIngredient;
-import org.cloudburstmc.protocol.bedrock.data.payload.crafting.MaterialReducerEntryOutput;
-import org.cloudburstmc.protocol.bedrock.data.payload.crafting.MultiRecipePayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.crafting.ShapedRecipePayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.crafting.ShapelessRecipePayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.crafting.SmithingTransformRecipePayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.crafting.SmithingTrimRecipePayload;
+import org.cloudburstmc.protocol.bedrock.data.recipe.ContainerMixDataEntry;
+import org.cloudburstmc.protocol.bedrock.data.recipe.MaterialReducerDataEntry;
+import org.cloudburstmc.protocol.bedrock.data.recipe.MaterialReducerEntryOutput;
+import org.cloudburstmc.protocol.bedrock.data.recipe.MultiRecipePayload;
+import org.cloudburstmc.protocol.bedrock.data.recipe.PotionMixDataEntry;
+import org.cloudburstmc.protocol.bedrock.data.recipe.RecipeIngredient;
+import org.cloudburstmc.protocol.bedrock.data.recipe.ShapedRecipePayload;
+import org.cloudburstmc.protocol.bedrock.data.recipe.ShapelessRecipePayload;
+import org.cloudburstmc.protocol.bedrock.data.recipe.SmithingTransformRecipePayload;
+import org.cloudburstmc.protocol.bedrock.data.recipe.SmithingTrimRecipePayload;
 import org.cloudburstmc.protocol.bedrock.packet.CraftingDataPacket;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.network.NetworkConstants;
@@ -142,7 +145,7 @@ public class RecipeUtil {
             );
         }
 
-        for (final org.cloudburstmc.protocol.bedrock.data.payload.crafting.PotionMixDataEntry potionMix : packet.getPotionMixes()) {
+        for (final org.cloudburstmc.protocol.bedrock.data.recipe.PotionMixDataEntry potionMix : packet.getPotionMixes()) {
             potionMixes.add(
                 new PotionMixDataEntry(
                     getItemIdByRuntime(potionMix.getFromPotionId(), definitions),
@@ -155,7 +158,7 @@ public class RecipeUtil {
             );
         }
 
-        for (final org.cloudburstmc.protocol.bedrock.data.payload.crafting.ContainerMixDataEntry containerMix : packet.getContainerMixes()) {
+        for (final org.cloudburstmc.protocol.bedrock.data.recipe.ContainerMixDataEntry containerMix : packet.getContainerMixes()) {
             containerMixes.add(new ContainerMixDataEntry(
                     getItemIdByRuntime(containerMix.getFromItemId(), definitions),
                     getItemIdByRuntime(containerMix.getReagentItemId(), definitions),
@@ -164,7 +167,7 @@ public class RecipeUtil {
             );
         }
 
-        for (final org.cloudburstmc.protocol.bedrock.data.payload.crafting.MaterialReducerDataEntry materialReducer : packet.getMaterialReducers()) {
+        for (final org.cloudburstmc.protocol.bedrock.data.recipe.MaterialReducerDataEntry materialReducer : packet.getMaterialReducers()) {
             final List<RecipeItemDefinitionEntry> itemCounts = new ObjectArrayList<>();
             for (final MaterialReducerEntryOutput output : materialReducer.getItemIdsAndCounts()) {
                 itemCounts.add(

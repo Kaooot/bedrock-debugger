@@ -2,6 +2,7 @@ package dev.kaooot.debugger.actor;
 
 import com.google.common.base.CaseFormat;
 import it.unimi.dsi.fastutil.Function;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import org.cloudburstmc.protocol.bedrock.data.actor.ActorDataMap;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorDataTypes;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorEvent;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
-import org.cloudburstmc.protocol.bedrock.data.actor.ActorLink;
+import org.cloudburstmc.protocol.bedrock.data.actor.link.ActorLink;
 import org.cloudburstmc.protocol.bedrock.packet.RemoveActorPacket;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.api.shape.DebugBox;
@@ -138,7 +139,7 @@ public class Actor {
             }
         }
 
-        final EnumSet<ActorFlags> flags = this.metadata.getOrCreateFlags();
+        final EnumMap<ActorFlags, Boolean> flags = this.metadata.getOrCreateFlags();
 
         final DebugText text = new DebugText();
         text.setId(actorBoxTextId);

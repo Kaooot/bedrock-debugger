@@ -1,23 +1,23 @@
 package dev.kaooot.debugger.player;
 
+import dev.kaooot.debugger.BedrockDebuggerProxy;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cloudburstmc.math.vector.Vector3i;
-import org.cloudburstmc.protocol.bedrock.data.AbilitiesIndex;
-import org.cloudburstmc.protocol.bedrock.data.PlayerActionType;
-import org.cloudburstmc.protocol.bedrock.data.PlayerBlockActionData;
-import org.cloudburstmc.protocol.bedrock.data.map.MapPixel;
-import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedAbilitiesData;
-import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedAbilitiesDataSerializedLayer;
-import org.cloudburstmc.protocol.bedrock.data.payload.inventory.transaction.ItemUseOnActorActionType;
-import org.cloudburstmc.protocol.bedrock.data.payload.inventory.transaction.data.InventoryTransactionDataType;
-import org.cloudburstmc.protocol.bedrock.data.payload.inventory.transaction.data.ItemUseOnActorInventoryTransaction;
+import org.cloudburstmc.protocol.bedrock.data.ability.AbilitiesIndex;
+import org.cloudburstmc.protocol.bedrock.data.ability.SerializedAbilitiesData;
+import org.cloudburstmc.protocol.bedrock.data.ability.SerializedAbilitiesDataSerializedLayer;
+import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.InventoryTransactionDataType;
+import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.ItemUseOnActorActionType;
+import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.ItemUseOnActorInventoryTransaction;
+import org.cloudburstmc.protocol.bedrock.data.map.ClientPixelsProxy;
+import org.cloudburstmc.protocol.bedrock.data.player.PlayerBlockActionData;
+import org.cloudburstmc.protocol.bedrock.data.player.input.PlayerActionType;
 import org.cloudburstmc.protocol.bedrock.packet.InventoryTransactionPacket;
 import org.cloudburstmc.protocol.bedrock.packet.MapInfoRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerActionPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerAuthInputPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateAbilitiesPacket;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -67,17 +67,17 @@ public class CheatClientAuthority {
             for (int z = -this.settings.getNukerWidth(); z <= this.settings.getNukerWidth(); z++) {
                 for (int y = -this.settings.getNukerHeight(); y <= this.settings.getNukerHeight();
                      y++) {
-                    final Vector3i posOffset = firstAction.getBlockPosition().add(x, y, z);
+                    final Vector3i posOffset = firstAction.getPosition().add(x, y, z);
 
                     final PlayerBlockActionData startDestroyAction = new PlayerBlockActionData();
                     startDestroyAction.setPlayerActionType(PlayerActionType.START_DESTROY_BLOCK);
-                    startDestroyAction.setBlockPosition(posOffset);
+                    startDestroyAction.setPosition(posOffset);
 
                     final PlayerBlockActionData predictDestroyAction = new PlayerBlockActionData();
                     predictDestroyAction.setPlayerActionType(
                         PlayerActionType.PREDICT_DESTROY_BLOCK
                     );
-                    predictDestroyAction.setBlockPosition(posOffset);
+                    predictDestroyAction.setPosition(posOffset);
 
                     packet.getPlayerBlockActions().add(startDestroyAction);
                     packet.getPlayerBlockActions().add(predictDestroyAction);
@@ -143,7 +143,10 @@ public class CheatClientAuthority {
         final MapInfoRequestPacket packet = new MapInfoRequestPacket();
         packet.setMapUniqueID(0L);
         for (int i = 0; i < 65000; i++) {
-            packet.getClientPixelsList().add(new MapPixel(0, i));
+            final ClientPixelsProxy pixel = new ClientPixelsProxy();
+            pixel.setPixel(i);
+            pixel.setIndex(0);
+            packet.getClientPixelsList().add(pixel);
         }
 
         this.proxy.getClient().sendPacket(packet);

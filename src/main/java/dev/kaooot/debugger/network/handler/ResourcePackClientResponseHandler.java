@@ -3,7 +3,7 @@ package dev.kaooot.debugger.network.handler;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.cloudburstmc.protocol.bedrock.data.ResourcePackResponse;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.ResourcePackResponse;
 import org.cloudburstmc.protocol.bedrock.packet.ResourcePackClientResponsePacket;
 import org.cloudburstmc.protocol.bedrock.packet.ResourcePackDataInfoPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;

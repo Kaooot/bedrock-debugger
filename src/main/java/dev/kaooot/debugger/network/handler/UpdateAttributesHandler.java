@@ -1,6 +1,6 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.payload.attribute.AttributeData;
+import org.cloudburstmc.protocol.bedrock.data.actor.attribute.AttributeData;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateAttributesPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
@@ -21,9 +21,9 @@ public class UpdateAttributesHandler implements PacketHandler<UpdateAttributesPa
     @Override
     public PacketSignal handle(UpdateAttributesPacket packet, BedrockDebuggerProxy proxy) {
         for (final Actor actor : proxy.getActors()) {
-            if (actor.getRuntimeId() == packet.getRuntimeID()) {
+            if (actor.getRuntimeId() == packet.getTargetRuntimeID()) {
                 for (final AttributeData attributeData : packet.getAttributeList()) {
-                    if (attributeData.getAttributeName().equalsIgnoreCase("minecraft:health")) {
+                    if (attributeData.getName().equalsIgnoreCase("minecraft:health")) {
                         actor.setHealth(attributeData.getCurrentValue());
                         actor.setMaxHealth(attributeData.getMaxValue());
                     }

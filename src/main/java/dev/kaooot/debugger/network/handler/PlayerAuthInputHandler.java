@@ -7,7 +7,8 @@ import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
 import dev.kaooot.debugger.network.PacketHandler;
 import dev.kaooot.debugger.util.Util;
-import org.cloudburstmc.protocol.bedrock.data.PlatformType;
+import org.cloudburstmc.math.vector.Vector3f;
+import org.cloudburstmc.protocol.bedrock.data.connection.PlatformType;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerAuthInputPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 
@@ -25,7 +26,11 @@ public class PlayerAuthInputHandler implements PacketHandler<PlayerAuthInputPack
         }
 
         proxy.getPlayer().setPosition(packet.getPosition());
-        proxy.getPlayer().setRotation(packet.getPlayerRotation());
+        proxy.getPlayer().setRotation(
+            Vector3f.from(
+                packet.getPlayerRotation(), packet.getPlayerHeadRotation()
+            )
+        );
 
         final SettingsConfig settingsConfig = Registries.
             <ConfigRegistry>getRegistry(RegistryKey.CONFIG)
@@ -34,7 +39,7 @@ public class PlayerAuthInputHandler implements PacketHandler<PlayerAuthInputPack
 
         packet.setInputMode(Util.getInputMode(platformType));
         packet.setPlayMode(Util.getClientPlayMode(platformType));
-        packet.setNewInteractionModel(Util.getInputInteractionModel(platformType));
+        packet.setNewInteractionModel(Util.getNewInteractionModel(platformType));
 
         if (proxy.getPlayer().isReadyToRoll() && settingsConfig.isRenderCurrentChunk()) {
             proxy.getPlayer().getChunkDebugRenderer()

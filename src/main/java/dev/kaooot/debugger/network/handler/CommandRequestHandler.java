@@ -22,7 +22,7 @@ public class CommandRequestHandler implements PacketHandler<CommandRequestPacket
 
     @Override
     public PacketSignal handle(CommandRequestPacket packet, BedrockDebuggerProxy proxy) {
-        final CommandOriginType type = packet.getCommandOrigin().getCommandType();
+        final CommandOriginType type = packet.getOrigin().getType();
         final boolean isDevConsoleOrigin = type.equals(CommandOriginType.DEV_CONSOLE);
         if (!type.equals(CommandOriginType.PLAYER) && !isDevConsoleOrigin) {
             return PacketSignal.UNHANDLED;
@@ -46,9 +46,15 @@ public class CommandRequestHandler implements PacketHandler<CommandRequestPacket
         }
         proxy.getLogger().debug("Server command execution: {}", packet.getCommand());
         if (isDevConsoleOrigin) {
-            final CommandOriginData data = packet.getCommandOrigin();
-            packet.setCommandOrigin(new CommandOriginData(CommandOriginType.PLAYER,
-                data.getCommandUUID(), data.getRequestID(), -1L));
+            final CommandOriginData data = packet.getOrigin();
+
+            final CommandOriginData newData = new CommandOriginData();
+            newData.setType(CommandOriginType.PLAYER);
+            newData.setUuid(data.getUuid());
+            newData.setRequestId(data.getRequestId());
+            newData.setPlayerId(-1L);
+
+            packet.setOrigin(newData);
             proxy.getClient().sendPacket(packet);
             return PacketSignal.HANDLED;
         }

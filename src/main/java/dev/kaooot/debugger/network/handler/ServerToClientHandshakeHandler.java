@@ -27,7 +27,7 @@ public class ServerToClientHandshakeHandler
     @Override
     public PacketSignal handle(ServerToClientHandshakePacket packet, BedrockDebuggerProxy proxy) {
         try {
-            final SignedJWT jwt = SignedJWT.parse(packet.getHandshakeWebToken());
+            final SignedJWT jwt = SignedJWT.parse(packet.getHandshakeWebtoken());
             final URI x5u = jwt.getHeader().getX509CertURL();
             final byte[] salt = Base64.getDecoder().decode(jwt.getJWTClaimsSet()
                 .getStringClaim("salt"));

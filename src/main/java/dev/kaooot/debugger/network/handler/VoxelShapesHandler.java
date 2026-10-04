@@ -5,7 +5,7 @@ import java.util.List;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
 import org.cloudburstmc.nbt.NbtType;
-import org.cloudburstmc.protocol.bedrock.data.VoxelShapes;
+import org.cloudburstmc.protocol.bedrock.data.block.SerializableVoxelShape;
 import org.cloudburstmc.protocol.bedrock.packet.VoxelShapesPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
@@ -21,7 +21,7 @@ public class VoxelShapesHandler implements PacketHandler<VoxelShapesPacket> {
     @Override
     public PacketSignal handle(VoxelShapesPacket packet, BedrockDebuggerProxy proxy) {
         final List<NbtMap> shapes = new ObjectArrayList<>();
-        for (final VoxelShapes.SerializableVoxelShape shape : packet.getShapes()) {
+        for (final SerializableVoxelShape shape : packet.getShapes()) {
             final NbtMapBuilder cellsBuilder = NbtMap.builder();
             cellsBuilder.putInt("xSize", shape.getCells().getXSize());
             cellsBuilder.putInt("ySize", shape.getCells().getYSize());

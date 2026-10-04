@@ -5,7 +5,7 @@ import dev.kaooot.debugger.util.DebugElement;
 import dev.kaooot.debugger.util.Util;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
-import org.cloudburstmc.protocol.bedrock.data.payload.diagnostics.MemoryCategory;
+import org.cloudburstmc.protocol.bedrock.data.diagnostics.MemoryCategory;
 import org.cloudburstmc.protocol.bedrock.packet.ServerboundDiagnosticsPacket;
 
 /**

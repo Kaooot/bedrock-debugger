@@ -8,10 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.PrimitiveShapeDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.PrimitiveShapeDataPayload;
 import org.cloudburstmc.protocol.bedrock.packet.PrimitiveShapesPacket;
 import org.cloudburstmc.protocol.common.util.Preconditions;
 

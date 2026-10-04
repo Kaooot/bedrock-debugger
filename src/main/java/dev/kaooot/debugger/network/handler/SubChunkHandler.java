@@ -8,9 +8,9 @@ import dev.kaooot.debugger.level.storage.SubChunkStorage;
 import dev.kaooot.debugger.network.PacketHandler;
 import io.netty.buffer.ByteBuf;
 import org.cloudburstmc.math.vector.Vector3i;
-import org.cloudburstmc.protocol.bedrock.data.payload.chunk.SubChunkPacketData;
-import org.cloudburstmc.protocol.bedrock.data.payload.chunk.SubChunkRequestResult;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
+import org.cloudburstmc.protocol.bedrock.data.chunk.SubChunkPacketData;
+import org.cloudburstmc.protocol.bedrock.data.chunk.SubChunkRequestResult;
+import org.cloudburstmc.protocol.bedrock.data.world.DimensionType;
 import org.cloudburstmc.protocol.bedrock.packet.SubChunkPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 

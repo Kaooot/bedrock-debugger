@@ -1,7 +1,7 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.ActorLinkType;
-import org.cloudburstmc.protocol.bedrock.data.actor.ActorLink;
+import org.cloudburstmc.protocol.bedrock.data.actor.link.ActorLink;
+import org.cloudburstmc.protocol.bedrock.data.actor.link.ActorLinkType;
 import org.cloudburstmc.protocol.bedrock.packet.SetActorLinkPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;

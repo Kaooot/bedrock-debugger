@@ -4,6 +4,7 @@ import java.util.List;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
 import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition;
+import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition;
 import org.cloudburstmc.protocol.bedrock.packet.ItemRegistryPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import org.cloudburstmc.protocol.common.SimpleDefinitionRegistry;
@@ -20,7 +21,7 @@ public class ItemRegistryHandler implements PacketHandler<ItemRegistryPacket> {
 
     @Override
     public PacketSignal handle(ItemRegistryPacket packet, BedrockDebuggerProxy proxy) {
-        final List<ItemDefinition> sortedItemData = packet.getItemData()
+        final List<SimpleItemDefinition> sortedItemData = packet.getItemData()
             .stream()
             .sorted((o1, o2) ->
                 String.CASE_INSENSITIVE_ORDER.compare(

@@ -1,7 +1,7 @@
 package dev.kaooot.debugger.command.internal;
 
-import org.cloudburstmc.protocol.bedrock.data.GameType;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandParamType;
+import org.cloudburstmc.protocol.bedrock.data.world.GameType;
 import org.cloudburstmc.protocol.bedrock.packet.SetPlayerGameTypePacket;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.api.command.Command;

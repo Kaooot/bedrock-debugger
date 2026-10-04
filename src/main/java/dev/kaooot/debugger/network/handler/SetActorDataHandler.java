@@ -28,7 +28,7 @@ public class SetActorDataHandler implements PacketHandler<SetActorDataPacket> {
         if (packet.getActorData().containsKey(ActorDataTypes.NAME)) {
             for (final ServerPlayer player : proxy.getPlayers()) {
                 if (player.getRuntimeId() == packet.getTargetRuntimeID()) {
-                    player.setNameTag(packet.getActorData().get(ActorDataTypes.NAME));
+                    player.setNameTag((String) packet.getActorData().get(ActorDataTypes.NAME));
                     break;
                 }
             }
@@ -47,7 +47,7 @@ public class SetActorDataHandler implements PacketHandler<SetActorDataPacket> {
         if (!packet.getActorData().containsKey(ActorDataTypes.NAME)) {
             return PacketSignal.UNHANDLED;
         }
-        final String name = packet.getActorData().get(ActorDataTypes.NAME);
+        final String name = (String) packet.getActorData().get(ActorDataTypes.NAME);
         for (final Actor actor : proxy.getActors()) {
             if (actor.getRuntimeId() == packet.getTargetRuntimeID()) {
                 actor.setName(name);

@@ -16,5 +16,5 @@ public @interface SubCommandValue {
 
     String first();
 
-    String second();
+    int second();
 }

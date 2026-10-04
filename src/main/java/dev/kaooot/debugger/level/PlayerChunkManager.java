@@ -17,9 +17,10 @@ import org.cloudburstmc.math.vector.Vector3i;
 import org.cloudburstmc.nbt.NBTInputStream;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtUtils;
-import org.cloudburstmc.protocol.bedrock.data.BlockChangeEntry;
+import org.cloudburstmc.protocol.bedrock.data.chunk.UpdateSubChunkBlocksChangedInfo;
+import org.cloudburstmc.protocol.bedrock.data.chunk.UpdateSubChunkNetworkBlockInfo;
 import org.cloudburstmc.protocol.bedrock.data.definitions.BlockDefinition;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
+import org.cloudburstmc.protocol.bedrock.data.world.DimensionType;
 import org.cloudburstmc.protocol.bedrock.packet.BlockActorDataPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateSubChunkBlocksPacket;
 
@@ -72,7 +73,8 @@ public class PlayerChunkManager {
             );
             return;
         }
-        for (final BlockChangeEntry standardBlock : packet.getStandardBlocks()) {
+        for (final UpdateSubChunkNetworkBlockInfo standardBlock :
+            packet.getBlocksChanged().getBlocksChangedStandards()) {
             final Vector3i blockPos = standardBlock.getPos();
             final int runtimeId = standardBlock.getDefinition().getRuntimeId();
             chunk.setBlock(
@@ -90,7 +92,7 @@ public class PlayerChunkManager {
                 );
             }
         }
-        for (final BlockChangeEntry extraBlock : packet.getExtraBlocks()) {
+        for (final UpdateSubChunkNetworkBlockInfo extraBlock : packet.getBlocksChanged().getBlocksChangedExtras()) {
             chunk.setBlock(
                 extraBlock.getPos().getX(),
                 extraBlock.getPos().getY(),

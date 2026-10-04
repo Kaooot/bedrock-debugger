@@ -1,6 +1,6 @@
 package dev.kaooot.debugger.util;
 
-import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -13,6 +13,7 @@ import org.cloudburstmc.protocol.bedrock.data.biome.BiomeCappedSurfaceData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeClimateData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeConditionalTransformationData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeConsolidatedFeatureData;
+import org.cloudburstmc.protocol.bedrock.data.biome.BiomeConsolidatedFeaturesData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeCoordinateData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeDefinitionChunkGenData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeDefinitionData;
@@ -24,16 +25,17 @@ import org.cloudburstmc.protocol.bedrock.data.biome.BiomeMultinoiseGenRulesData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeNoiseGradientSurfaceData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeOverworldGenRulesData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeReplacementData;
+import org.cloudburstmc.protocol.bedrock.data.biome.BiomeReplacementsData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeScatterParamData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeSurfaceBuilderData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeSurfaceMaterialAdjustmentData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeSurfaceMaterialData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeWeightedData;
 import org.cloudburstmc.protocol.bedrock.data.biome.BiomeWeightedTemperatureData;
-import org.cloudburstmc.protocol.bedrock.data.biome.NoiseDescriptor;
-import org.cloudburstmc.protocol.bedrock.data.biome.SerializedNoiseBlockSpecifier;
-import org.cloudburstmc.protocol.bedrock.data.biome.VillageType;
 import org.cloudburstmc.protocol.bedrock.data.definitions.BlockDefinition;
+import org.cloudburstmc.protocol.bedrock.data.structure.NoiseDescriptor;
+import org.cloudburstmc.protocol.bedrock.data.structure.SerializedNoiseBlockSpecifier;
+import org.cloudburstmc.protocol.bedrock.data.world.VillageType;
 import org.cloudburstmc.protocol.bedrock.packet.BiomeDefinitionListPacket;
 
 /**
@@ -45,20 +47,20 @@ import org.cloudburstmc.protocol.bedrock.packet.BiomeDefinitionListPacket;
 public class BiomeUtil {
 
     public NbtMap parseBiomeDefinitionList(BiomeDefinitionListPacket packet) {
-        final List<NbtMap> parsedBiomeData = parseBiomeData(packet.getBiomes());
+        final List<NbtMap> parsedBiomeData = parseBiomeData(packet.getMapOfBiomeNamesToData());
         return NbtMap.builder()
-            .putList("biomeStringList", NbtType.STRING, packet.getBiomeStringList())
+            .putList("biomeStringList", NbtType.STRING, packet.getStringList().getStrings())
             .putList("biomeData", NbtType.COMPOUND, parsedBiomeData)
             .build();
     }
 
-    private List<NbtMap> parseBiomeData(List<Pair<Short, BiomeDefinitionData>> biomeData) {
+    private List<NbtMap> parseBiomeData(Int2ObjectMap<BiomeDefinitionData> biomeData) {
         final List<NbtMap> list = new ObjectArrayList<>();
 
-        for (final Pair<Short, BiomeDefinitionData> pair : biomeData) {
+        for (final Int2ObjectMap.Entry<BiomeDefinitionData> entry : biomeData.int2ObjectEntrySet()) {
             final NbtMapBuilder builder = NbtMap.builder();
-            builder.putShort("index", pair.key())
-                .putCompound("data", parseBiomeDefinitionData(pair.value()));
+            builder.putShort("index", (short) entry.getIntKey())
+                .putCompound("data", parseBiomeDefinitionData(entry.getValue()));
 
             list.add(builder.build());
         }
@@ -69,7 +71,7 @@ public class BiomeUtil {
         final NbtMapBuilder builder = NbtMap.builder();
 
         if (data.getId() != null) {
-            builder.putShort("id", data.getId());
+            builder.putShort("id", data.getId().shortValue());
         } else {
             // vanilla biomes do not contain ids so the server must send -1
             builder.putShort("id", (short) -1);
@@ -77,7 +79,9 @@ public class BiomeUtil {
 
         final List<Short> tagIds = new ObjectArrayList<>();
         if (data.getTags() != null) {
-            tagIds.addAll(data.getTags());
+            for (final Integer tag : data.getTags().getTags()) {
+                tagIds.add(tag.shortValue());
+            }
         }
 
         builder.putFloat("temperature", data.getTemperature())
@@ -85,7 +89,7 @@ public class BiomeUtil {
             .putFloat("foliageSnow", data.getFoliageSnow())
             .putFloat("depth", data.getDepth())
             .putFloat("scale", data.getScale())
-            .putInt("mapWaterColorARGB", data.getMapWaterColor().getRGB())
+            .putInt("mapWaterColorARGB", data.getMapWaterColorArgb().getRGB())
             .putBoolean("rain", data.isRain())
             .putCompound("tags", NbtMap.builder()
                 .putList("tags", NbtType.SHORT, tagIds)
@@ -115,12 +119,12 @@ public class BiomeUtil {
                 .build());
         }
 
-        final List<BiomeConsolidatedFeatureData> consolidatedFeatures =
+        final BiomeConsolidatedFeaturesData consolidatedFeatures =
             chunkGenData.getConsolidatedFeatures();
 
         if (consolidatedFeatures != null) {
             final List<NbtMap> features = new ObjectArrayList<>();
-            for (final BiomeConsolidatedFeatureData feature : consolidatedFeatures) {
+            for (final BiomeConsolidatedFeatureData feature : consolidatedFeatures.getFeatures()) {
                 final NbtMapBuilder featureBuilder = NbtMap.builder();
                 final BiomeScatterParamData scatter = feature.getScatter();
                 final NbtMapBuilder scatterParamBuilder = NbtMap.builder();
@@ -133,12 +137,12 @@ public class BiomeUtil {
                         coordinateBuilder.putInt("minValueType",
                             coordinate.getMinValueType().ordinal());
                     }
-                    coordinateBuilder.putShort("minValue", coordinate.getMinValue());
+                    coordinateBuilder.putShort("minValue", (short) coordinate.getMinValue());
                     if (coordinate.getMaxValueType() != null) {
                         coordinateBuilder.putInt("maxValueType",
                             coordinate.getMaxValueType().ordinal());
                     }
-                    coordinateBuilder.putShort("maxValue", coordinate.getMaxValue());
+                    coordinateBuilder.putShort("maxValue", (short) coordinate.getMaxValue());
                     coordinateBuilder.putLong("gridOffset", coordinate.getGridOffset())
                         .putLong("gridStepSize", coordinate.getGridStepSize());
                     if (coordinate.getDistribution() != null) {
@@ -151,16 +155,16 @@ public class BiomeUtil {
                 scatterParamBuilder.putList("coordinates", NbtType.COMPOUND, coordinateData)
                     .putInt("evalOrder", scatter.getEvalOrder().ordinal())
                     .putInt("chancePercentType", scatter.getChancePercentType().ordinal())
-                    .putShort("chancePercent", scatter.getChancePercent())
+                    .putShort("chancePercent", (short) scatter.getChancePercent())
                     .putInt("chanceNumerator", scatter.getChanceNumerator())
                     .putInt("chanceDenominator", scatter.getChanceDenominator())
                     .putInt("iterationsType", scatter.getIterationsType().ordinal())
-                    .putShort("iterations", scatter.getIterations());
+                    .putShort("iterations", (short) scatter.getIterations());
 
                 features.add(featureBuilder.putCompound("scatter", scatterParamBuilder.build())
-                    .putShort("feature", feature.getFeature())
-                    .putShort("identifier", feature.getIdentifier())
-                    .putShort("pass", feature.getPass())
+                    .putShort("feature", (short) feature.getFeature())
+                    .putShort("identifier", (short) feature.getIdentifier())
+                    .putShort("pass", (short) feature.getPass())
                     .putBoolean("canUseInternalFeature", feature.isCanUseInternalFeature())
                     .build());
             }
@@ -184,20 +188,20 @@ public class BiomeUtil {
         }
 
         final BiomeSurfaceMaterialAdjustmentData surfaceMaterialAdjustments =
-            chunkGenData.getSurfaceMaterialAdjustment();
+            chunkGenData.getSurfaceMaterialAdjustments();
 
         if (surfaceMaterialAdjustments != null) {
             final List<NbtMap> adjustments = new ObjectArrayList<>();
 
-            for (final BiomeElementData adjustment : surfaceMaterialAdjustments.getBiomeElements()) {
+            for (final BiomeElementData adjustment : surfaceMaterialAdjustments.getAdjustments()) {
                 adjustments.add(NbtMap.builder()
-                    .putFloat("noiseFrequencyScale", adjustment.getNoiseFrequencyScale())
+                    .putFloat("noiseFrequencyScale", adjustment.getNoiseFreqScale())
                     .putFloat("noiseLowerBound", adjustment.getNoiseLowerBound())
                     .putFloat("noiseUpperBound", adjustment.getNoiseUpperBound())
                     .putInt("heightMinType", adjustment.getHeightMinType().ordinal())
-                    .putShort("heightMin", adjustment.getHeightMin())
+                    .putShort("heightMin", (short) adjustment.getHeightMin())
                     .putInt("heightMaxType", adjustment.getHeightMinType().ordinal())
-                    .putShort("heightMax", adjustment.getHeightMax())
+                    .putShort("heightMax", (short) adjustment.getHeightMax())
                     .putCompound("adjustedMaterials",
                         parseBiomeSurfaceMaterialData(adjustment.getAdjustedMaterials()))
                     .build());
@@ -289,7 +293,7 @@ public class BiomeUtil {
         if (legacyWorldGenRules != null) {
             final List<NbtMap> legacyPreHills = new ObjectArrayList<>();
 
-            for (final BiomeConditionalTransformationData value : legacyWorldGenRules.getLegacyPreHills()) {
+            for (final BiomeConditionalTransformationData value : legacyWorldGenRules.getLegacyPreHillsEdge()) {
                 legacyPreHills.add(parseBiomeConditionalTransformationData(value));
             }
 
@@ -298,9 +302,11 @@ public class BiomeUtil {
                 .build());
         }
 
-        final List<BiomeReplacementData> data = chunkGenData.getReplacementBiomes();
+        final BiomeReplacementsData data = chunkGenData.getReplacementBiomes();
         if (data != null) {
-            builder.putList("replacementBiomes", NbtType.COMPOUND, parseReplacementDataList(data));
+            builder.putList("replacementBiomes", NbtType.COMPOUND,
+                parseReplacementDataList(data.getBiomeReplacements())
+            );
         }
 
         final VillageType villageType = chunkGenData.getVillageType();
@@ -308,9 +314,9 @@ public class BiomeUtil {
             builder.putInt("villageType", villageType.ordinal());
         }
 
-        if (chunkGenData.getSubSurfaceBuilderData() != null) {
+        if (chunkGenData.getSubsurfaceBuilderData() != null) {
             final BiomeSurfaceBuilderData subSurfaceBuilderData =
-                chunkGenData.getSubSurfaceBuilderData();
+                chunkGenData.getSubsurfaceBuilderData();
             builder.putCompound(
                 "subSurfaceBuilderData",
                 parseBiomeSurfaceBuilderData(subSurfaceBuilderData, NbtMap.builder())
@@ -342,7 +348,7 @@ public class BiomeUtil {
 
     private NbtMap parseBiomeWeightedData(BiomeWeightedData data) {
         return NbtMap.builder()
-            .putShort("biomeIdentifier", data.getBiomeIdentifier())
+            .putShort("biomeIdentifier", (short) data.getBiomeIdentifier())
             .putInt("weight", data.getWeight())
             .build();
     }
@@ -355,19 +361,24 @@ public class BiomeUtil {
         }
         return NbtMap.builder()
             .putList("transformsInto", NbtType.COMPOUND, transformsInto)
-            .putShort("conditionJson", data.getConditionJson())
+            .putShort("conditionJson", (short) data.getConditionJson())
             .putLong("minPassingNeighbors", data.getMinPassingNeighbors())
             .build();
     }
 
     private List<NbtMap> parseReplacementDataList(List<BiomeReplacementData> list) {
+
         final List<NbtMap> replacementDataList = new ObjectArrayList<>();
         for (final BiomeReplacementData data : list) {
+            final List<Short> targetBiomes = new ObjectArrayList<>();
+            for (final Integer targetBiome : data.getTargetBiomes()) {
+                targetBiomes.add(targetBiome.shortValue());
+            }
             replacementDataList.add(
                 NbtMap.builder()
-                    .putShort("replacementBiome", data.getBiome())
-                    .putShort("dimension", data.getDimension())
-                    .putList("targetBiomes", NbtType.SHORT, data.getTargetBiomes())
+                    .putShort("replacementBiome", (short) data.getReplacementBiome())
+                    .putShort("dimension", (short) data.getDimension())
+                    .putList("targetBiomes", NbtType.SHORT, targetBiomes)
                     .putFloat("amount", data.getAmount())
                     .putFloat("noiseFrequencyScale", data.getNoiseFrequencyScale())
                     .putInt("replacementIndex", data.getReplacementIndex())
@@ -415,7 +426,7 @@ public class BiomeUtil {
 
     private NbtMap parseBiomeSurfaceBuilderData(BiomeSurfaceBuilderData data,
                                                 NbtMapBuilder builder) {
-        final BiomeSurfaceMaterialData surfaceMaterials = data.getSurfaceMaterial();
+        final BiomeSurfaceMaterialData surfaceMaterials = data.getSurfaceMaterials();
         if (surfaceMaterials != null) {
             builder.putCompound(
                 "surfaceMaterials",
@@ -451,7 +462,7 @@ public class BiomeUtil {
     private NbtMap parseBiomeNoiseGradientSurfaceData(BiomeNoiseGradientSurfaceData data) {
         final NbtMapBuilder builder = NbtMap.builder();
         final List<Integer> nonReplaceableBlocks = new IntArrayList();
-        for (final BlockDefinition block : data.getNonReplaceableBlocks()) {
+        for (final BlockDefinition block : data.getNonreplaceableBlocks()) {
             nonReplaceableBlocks.add(block.getRuntimeId());
         }
         final List<NbtMap> gradientBlocks = new ObjectArrayList<>();

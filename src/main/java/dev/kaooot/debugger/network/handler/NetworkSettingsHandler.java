@@ -1,7 +1,7 @@
 package dev.kaooot.debugger.network.handler;
 
 import java.util.concurrent.TimeUnit;
-import org.cloudburstmc.protocol.bedrock.data.PacketCompressionAlgorithm;
+import org.cloudburstmc.protocol.bedrock.data.connection.PacketCompressionAlgorithm;
 import org.cloudburstmc.protocol.bedrock.packet.NetworkSettingsPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;

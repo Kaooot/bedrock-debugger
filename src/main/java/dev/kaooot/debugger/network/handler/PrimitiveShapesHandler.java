@@ -2,7 +2,7 @@ package dev.kaooot.debugger.network.handler;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.PrimitiveShapeDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.PrimitiveShapeDataPayload;
 import org.cloudburstmc.protocol.bedrock.packet.PrimitiveShapesPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;

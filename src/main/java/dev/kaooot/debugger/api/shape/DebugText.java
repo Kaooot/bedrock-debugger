@@ -4,8 +4,8 @@ import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.TextDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.data.shape.TextDataPayload;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

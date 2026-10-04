@@ -1,7 +1,8 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.payload.pack.PackIdVersion;
-import org.cloudburstmc.protocol.bedrock.data.payload.pack.PackInfoData;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.ContentIdentity;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.PackIdVersion;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.PackInfoData;
 import org.cloudburstmc.protocol.bedrock.packet.ResourcePacksInfoPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
@@ -42,11 +43,11 @@ public class ResourcePacksInfoHandler implements PacketHandler<ResourcePacksInfo
             packInfoData.setPackSize(pack.getSize());
             packInfoData.setContentKey("");
             packInfoData.setSubpackName("");
-            packInfoData.setContentIdentity("");
+            packInfoData.setContentIdentity(new ContentIdentity(""));
             packInfoData.setHasScripts(false);
             packInfoData.setAddonPack(false);
             packInfoData.setRayTracingCapable(false);
-            packInfoData.setCdnUrl("");
+            packInfoData.setCdnURL("");
             packet.getResourcePacks().add(packInfoData);
         }
 

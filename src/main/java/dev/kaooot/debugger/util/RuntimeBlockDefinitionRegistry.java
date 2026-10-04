@@ -25,11 +25,6 @@ public class RuntimeBlockDefinitionRegistry implements DefinitionRegistry<BlockD
     }
 
     @Override
-    public int getRuntimeIdByName(String name) {
-        return -1;
-    }
-
-    @Override
     public boolean isRegistered(BlockDefinition definition) {
         return this.definitions.containsValue(definition);
     }

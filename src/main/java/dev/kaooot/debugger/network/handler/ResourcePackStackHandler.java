@@ -1,6 +1,6 @@
 package dev.kaooot.debugger.network.handler;
 
-import org.cloudburstmc.protocol.bedrock.data.payload.pack.PackInstanceId;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.PackInstanceId;
 import org.cloudburstmc.protocol.bedrock.packet.ResourcePackStackPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
@@ -21,11 +21,10 @@ public class ResourcePackStackHandler implements PacketHandler<ResourcePackStack
         proxy.getPlayer().setStackIncludeEditorPacks(packet.isIncludeEditorPacks());
         proxy.getPlayer().setStackBaseGameVersion(packet.getBaseGameVersion());
         for (final ServerPack pack : proxy.getPackManager().getPacks()) {
-            final PackInstanceId entry = new PackInstanceId(
-                pack.getId().toString(),
-                pack.getVersion(),
-                ""
-            );
+            final PackInstanceId entry = new PackInstanceId();
+            entry.setPackID(pack.getId().toString());
+            entry.setVersion(pack.getVersion());
+            entry.setSubPackName("");
             packet.getTexturePackList().add(entry);
         }
         proxy.getServer().sendPacketImmediately(packet);

@@ -3,8 +3,8 @@ package dev.kaooot.debugger.api.shape;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.cloudburstmc.math.vector.Vector2f;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.CylinderDataPayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.data.shape.CylinderDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.ScriptPrimitiveShapeType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

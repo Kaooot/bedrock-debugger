@@ -43,7 +43,7 @@ public class PlayerFormManager {
 
         final ServerSettingsResponsePacket packet = new ServerSettingsResponsePacket();
         packet.setFormID(formId);
-        packet.setFormData(((BaseForm<?>) form).toJson().toString());
+        packet.setFormUiJson(((BaseForm<?>) form).toJson().toString());
         this.proxy.getServer().sendPacket(packet);
 
         this.serverSettingsFormId = formId;
@@ -62,7 +62,7 @@ public class PlayerFormManager {
 
         final ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.setFormID(formId);
-        packet.setFormData(((BaseForm<?>) form).toJson().toString());
+        packet.setFormUiJson(((BaseForm<?>) form).toJson().toString());
         this.proxy.getServer().sendPacket(packet);
         final FormListener listener = new FormListener();
         this.formListeners.put(formId, listener);

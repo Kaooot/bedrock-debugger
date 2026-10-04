@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.cloudburstmc.protocol.bedrock.data.PlatformType;
+import org.cloudburstmc.protocol.bedrock.data.connection.PlatformType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

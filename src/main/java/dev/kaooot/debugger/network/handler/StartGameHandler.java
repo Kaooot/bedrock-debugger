@@ -1,23 +1,25 @@
 package dev.kaooot.debugger.network.handler;
 
-import dev.kaooot.debugger.level.block.CustomBlockPropertyTable;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import java.lang.reflect.Field;
-import java.util.List;
-import org.cloudburstmc.nbt.NbtMap;
-import org.cloudburstmc.nbt.NbtType;
-import org.cloudburstmc.protocol.bedrock.data.ServerBlockProperty;
-import org.cloudburstmc.protocol.bedrock.data.SyncedPlayerMovementSettings;
-import org.cloudburstmc.protocol.bedrock.data.payload.experiment.ExperimentToggle;
-import org.cloudburstmc.protocol.bedrock.packet.StartGamePacket;
-import org.cloudburstmc.protocol.common.PacketSignal;
 import dev.kaooot.debugger.BedrockDebuggerProxy;
 import dev.kaooot.debugger.config.ConfigRegistry;
 import dev.kaooot.debugger.config.SettingsConfig;
 import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
+import dev.kaooot.debugger.level.block.CustomBlockPropertyTable;
 import dev.kaooot.debugger.network.PacketHandler;
 import dev.kaooot.debugger.player.ServerPlayer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import java.lang.reflect.Field;
+import java.util.List;
+import org.cloudburstmc.nbt.NbtMap;
+import org.cloudburstmc.nbt.NbtType;
+import org.cloudburstmc.protocol.bedrock.data.player.input.SyncedPlayerMovementSettings;
+import org.cloudburstmc.protocol.bedrock.data.world.ExperimentToggle;
+import org.cloudburstmc.protocol.bedrock.data.world.ServerBlockProperty;
+import org.cloudburstmc.protocol.bedrock.packet.StartGamePacket;
+import org.cloudburstmc.protocol.common.PacketSignal;
+
+;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -65,15 +67,15 @@ public class StartGameHandler implements PacketHandler<StartGamePacket> {
         int customBlockStateCount = 0;
         for (final ServerBlockProperty blockProperty : packet.getBlockProperties()) {
             final List<NbtMap> permutations = table.resolvePermutations(
-                blockProperty.getName(),
-                blockProperty.getProperties()
+                blockProperty.getBlockName(),
+                blockProperty.getBlockDefinition()
             );
             customBlockStateCount += permutations.size();
             proxy.getBlockPaletteManager().registerCustomBlockStates(permutations);
             list.add(
                 NbtMap.builder()
-                    .putString("name", blockProperty.getName())
-                    .putCompound("properties", blockProperty.getProperties())
+                    .putString("name", blockProperty.getBlockName())
+                    .putCompound("properties", blockProperty.getBlockDefinition())
                     .build()
             );
         }

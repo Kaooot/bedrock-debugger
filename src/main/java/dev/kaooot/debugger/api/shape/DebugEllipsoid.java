@@ -3,8 +3,8 @@ package dev.kaooot.debugger.api.shape;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.cloudburstmc.math.vector.Vector3f;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.EllipsoidDataPayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.data.shape.EllipsoidDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.ScriptPrimitiveShapeType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

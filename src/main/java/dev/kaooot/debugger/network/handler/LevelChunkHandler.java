@@ -6,7 +6,7 @@ import dev.kaooot.debugger.level.PlayerChunkManager;
 import dev.kaooot.debugger.level.storage.SubChunkStorage;
 import dev.kaooot.debugger.network.PacketHandler;
 import io.netty.buffer.ByteBuf;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
+import org.cloudburstmc.protocol.bedrock.data.world.DimensionType;
 import org.cloudburstmc.protocol.bedrock.packet.LevelChunkPacket;
 import org.cloudburstmc.protocol.common.PacketSignal;
 

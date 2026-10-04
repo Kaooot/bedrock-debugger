@@ -14,111 +14,121 @@ import dev.kaooot.debugger.core.registry.Registries;
 import dev.kaooot.debugger.core.registry.RegistryKey;
 import java.awt.Color;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.cloudburstmc.math.vector.Vector2f;
 import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.math.vector.Vector3i;
 import org.cloudburstmc.nbt.NbtMap;
-import org.cloudburstmc.protocol.bedrock.data.AbilitiesIndex;
-import org.cloudburstmc.protocol.bedrock.data.ActorBlockSyncMessageId;
-import org.cloudburstmc.protocol.bedrock.data.ActorLinkType;
-import org.cloudburstmc.protocol.bedrock.data.BlockChangeEntry;
-import org.cloudburstmc.protocol.bedrock.data.BookEditAction;
-import org.cloudburstmc.protocol.bedrock.data.BuildPlatform;
-import org.cloudburstmc.protocol.bedrock.data.CameraShakeAction;
-import org.cloudburstmc.protocol.bedrock.data.CameraShakeType;
-import org.cloudburstmc.protocol.bedrock.data.CodeBuilderCategoryType;
-import org.cloudburstmc.protocol.bedrock.data.CodeBuilderCodeStatus;
-import org.cloudburstmc.protocol.bedrock.data.CodeBuilderOperationType;
-import org.cloudburstmc.protocol.bedrock.data.ControlScheme;
-import org.cloudburstmc.protocol.bedrock.data.DebugMarkerData;
-import org.cloudburstmc.protocol.bedrock.data.Difficulty;
-import org.cloudburstmc.protocol.bedrock.data.Dimension;
-import org.cloudburstmc.protocol.bedrock.data.DisconnectFailReason;
-import org.cloudburstmc.protocol.bedrock.data.EduSharedUriResource;
-import org.cloudburstmc.protocol.bedrock.data.EducationLevelSettings;
-import org.cloudburstmc.protocol.bedrock.data.GameRuleData;
-import org.cloudburstmc.protocol.bedrock.data.GameType;
-import org.cloudburstmc.protocol.bedrock.data.GeneratorType;
-import org.cloudburstmc.protocol.bedrock.data.GraphicsMode;
-import org.cloudburstmc.protocol.bedrock.data.HudElement;
-import org.cloudburstmc.protocol.bedrock.data.HudVisibility;
-import org.cloudburstmc.protocol.bedrock.data.LevelEvent;
-import org.cloudburstmc.protocol.bedrock.data.MovementEffectType;
-import org.cloudburstmc.protocol.bedrock.data.MultiplayerSettingsPacketType;
-import org.cloudburstmc.protocol.bedrock.data.ObjectiveSortOrder;
-import org.cloudburstmc.protocol.bedrock.data.ParticleType;
-import org.cloudburstmc.protocol.bedrock.data.PayloadType;
-import org.cloudburstmc.protocol.bedrock.data.PhotoType;
-import org.cloudburstmc.protocol.bedrock.data.PlayerActionType;
-import org.cloudburstmc.protocol.bedrock.data.PlayerArmorDamageFlag;
-import org.cloudburstmc.protocol.bedrock.data.PlayerPermissionLevel;
-import org.cloudburstmc.protocol.bedrock.data.PlayerRespawnState;
-import org.cloudburstmc.protocol.bedrock.data.PredictionType;
-import org.cloudburstmc.protocol.bedrock.data.SimulationType;
-import org.cloudburstmc.protocol.bedrock.data.SoundEvent;
-import org.cloudburstmc.protocol.bedrock.data.SpawnPositionType;
-import org.cloudburstmc.protocol.bedrock.data.StoreOfferRedirectType;
-import org.cloudburstmc.protocol.bedrock.data.TextPacketType;
+import org.cloudburstmc.protocol.bedrock.data.ability.AbilitiesIndex;
+import org.cloudburstmc.protocol.bedrock.data.ability.SerializedAbilitiesData;
+import org.cloudburstmc.protocol.bedrock.data.ability.SerializedAbilitiesDataSerializedLayer;
+import org.cloudburstmc.protocol.bedrock.data.ability.SerializedLayer;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorEvent;
-import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
-import org.cloudburstmc.protocol.bedrock.data.actor.ActorLink;
-import org.cloudburstmc.protocol.bedrock.data.camera.AimAssistAction;
-import org.cloudburstmc.protocol.bedrock.data.command.CommandEnumData;
+import org.cloudburstmc.protocol.bedrock.data.actor.ActorType;
+import org.cloudburstmc.protocol.bedrock.data.actor.EntityNetId;
+import org.cloudburstmc.protocol.bedrock.data.actor.MovementEffectType;
+import org.cloudburstmc.protocol.bedrock.data.actor.attribute.AttributeData;
+import org.cloudburstmc.protocol.bedrock.data.actor.attribute.AttributeModifier;
+import org.cloudburstmc.protocol.bedrock.data.actor.attribute.AttributeModifierOperation;
+import org.cloudburstmc.protocol.bedrock.data.actor.attribute.AttributeOperands;
+import org.cloudburstmc.protocol.bedrock.data.actor.link.ActorLink;
+import org.cloudburstmc.protocol.bedrock.data.actor.link.ActorLinkType;
+import org.cloudburstmc.protocol.bedrock.data.book.Finalize;
+import org.cloudburstmc.protocol.bedrock.data.boss.BossBarColor;
+import org.cloudburstmc.protocol.bedrock.data.boss.BossBarOverlay;
+import org.cloudburstmc.protocol.bedrock.data.boss.BossEventUpdateType;
+import org.cloudburstmc.protocol.bedrock.data.camera.CameraShakeAction;
+import org.cloudburstmc.protocol.bedrock.data.camera.CameraShakeType;
+import org.cloudburstmc.protocol.bedrock.data.command.BlockCommandData;
+import org.cloudburstmc.protocol.bedrock.data.command.CommandBlockMode;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandOriginData;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandOriginType;
+import org.cloudburstmc.protocol.bedrock.data.command.CommandOutput;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandOutputType;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandParamType;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandPermissionLevel;
 import org.cloudburstmc.protocol.bedrock.data.command.SoftEnumUpdateType;
+import org.cloudburstmc.protocol.bedrock.data.connection.BuildPlatform;
+import org.cloudburstmc.protocol.bedrock.data.connection.DisconnectFailReason;
+import org.cloudburstmc.protocol.bedrock.data.connection.DisconnectPacketMessages;
+import org.cloudburstmc.protocol.bedrock.data.connection.GraphicsMode;
+import org.cloudburstmc.protocol.bedrock.data.connection.MultiplayerSettingsPacketType;
+import org.cloudburstmc.protocol.bedrock.data.debug.DebugMarkerData;
+import org.cloudburstmc.protocol.bedrock.data.debug.PayloadType;
 import org.cloudburstmc.protocol.bedrock.data.definitions.DimensionDefinition;
-import org.cloudburstmc.protocol.bedrock.data.definitions.FeatureDefinition;
-import org.cloudburstmc.protocol.bedrock.data.ee.AgentActionType;
-import org.cloudburstmc.protocol.bedrock.data.ee.LessonAction;
+import org.cloudburstmc.protocol.bedrock.data.education.AgentActionType;
+import org.cloudburstmc.protocol.bedrock.data.education.AgentAnimation;
+import org.cloudburstmc.protocol.bedrock.data.education.AgentCapabilities;
+import org.cloudburstmc.protocol.bedrock.data.education.CodeBuilderExecutionStateCodeStatus;
+import org.cloudburstmc.protocol.bedrock.data.education.CodeBuilderStorageQueryOptionsCategory;
+import org.cloudburstmc.protocol.bedrock.data.education.CodeBuilderStorageQueryOptionsOperation;
+import org.cloudburstmc.protocol.bedrock.data.education.EduSharedUriResource;
+import org.cloudburstmc.protocol.bedrock.data.education.EducationLevelSettings;
+import org.cloudburstmc.protocol.bedrock.data.education.ExternalLinkSettings;
+import org.cloudburstmc.protocol.bedrock.data.education.LabTableReactionType;
+import org.cloudburstmc.protocol.bedrock.data.education.LessonAction;
+import org.cloudburstmc.protocol.bedrock.data.education.PhotoType;
+import org.cloudburstmc.protocol.bedrock.data.form.NpcDialogueActionType;
 import org.cloudburstmc.protocol.bedrock.data.inventory.ContainerEnumName;
 import org.cloudburstmc.protocol.bedrock.data.inventory.ContainerType;
-import org.cloudburstmc.protocol.bedrock.data.inventory.EnchantmentInstance;
 import org.cloudburstmc.protocol.bedrock.data.inventory.FullContainerName;
 import org.cloudburstmc.protocol.bedrock.data.inventory.InventoryLayout;
 import org.cloudburstmc.protocol.bedrock.data.inventory.InventoryLeftTabIndex;
+import org.cloudburstmc.protocol.bedrock.data.inventory.InventoryOptions;
 import org.cloudburstmc.protocol.bedrock.data.inventory.InventoryRightTabIndex;
 import org.cloudburstmc.protocol.bedrock.data.inventory.ItemData;
-import org.cloudburstmc.protocol.bedrock.data.inventory.ItemEnchantOption;
-import org.cloudburstmc.protocol.bedrock.data.inventory.ItemEnchants;
-import org.cloudburstmc.protocol.bedrock.data.inventory.ItemUseMethod;
-import org.cloudburstmc.protocol.bedrock.data.inventory.LabTableReactionType;
-import org.cloudburstmc.protocol.bedrock.data.map.MapPixel;
-import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedAbilitiesData;
-import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedAbilitiesDataSerializedLayer;
-import org.cloudburstmc.protocol.bedrock.data.payload.abilities.SerializedLayer;
-import org.cloudburstmc.protocol.bedrock.data.payload.attribute.AttributeData;
-import org.cloudburstmc.protocol.bedrock.data.payload.attribute.AttributeModifier;
-import org.cloudburstmc.protocol.bedrock.data.payload.attribute.AttributeModifierOperation;
-import org.cloudburstmc.protocol.bedrock.data.payload.attribute.AttributeOperands;
-import org.cloudburstmc.protocol.bedrock.data.payload.boss.BossBarColor;
-import org.cloudburstmc.protocol.bedrock.data.payload.boss.BossBarOverlay;
-import org.cloudburstmc.protocol.bedrock.data.payload.boss.BossEventUpdateType;
-import org.cloudburstmc.protocol.bedrock.data.payload.command.BlockCommandData;
-import org.cloudburstmc.protocol.bedrock.data.payload.command.CommandBlockMode;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.RedactableString;
-import org.cloudburstmc.protocol.bedrock.data.payload.connection.DisconnectPacketMessages;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.PrimitiveShapeDataPayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.ScriptPrimitiveShapeType;
-import org.cloudburstmc.protocol.bedrock.data.payload.shape.SphereDataPayload;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.AnimationMode;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.Mirror;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.Rotation;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.StructureBlockType;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.StructureEditorData;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.StructureRedstoneSaveMode;
-import org.cloudburstmc.protocol.bedrock.data.payload.structure.StructureSettings;
-import org.cloudburstmc.protocol.bedrock.data.payload.text.AuthorAndMessage;
+import org.cloudburstmc.protocol.bedrock.data.item.EnchantType;
+import org.cloudburstmc.protocol.bedrock.data.item.EnchantmentInstance;
+import org.cloudburstmc.protocol.bedrock.data.item.ItemEnchantOption;
+import org.cloudburstmc.protocol.bedrock.data.item.ItemEnchants;
+import org.cloudburstmc.protocol.bedrock.data.map.ClientPixelsProxy;
+import org.cloudburstmc.protocol.bedrock.data.misc.RedactableString;
+import org.cloudburstmc.protocol.bedrock.data.misc.ShowStoreOfferRedirectType;
+import org.cloudburstmc.protocol.bedrock.data.misc.Subtype;
+import org.cloudburstmc.protocol.bedrock.data.player.ControlScheme;
+import org.cloudburstmc.protocol.bedrock.data.player.HudElement;
+import org.cloudburstmc.protocol.bedrock.data.player.HudVisibility;
+import org.cloudburstmc.protocol.bedrock.data.player.PlayerInputTick;
+import org.cloudburstmc.protocol.bedrock.data.player.PlayerPermissionLevel;
+import org.cloudburstmc.protocol.bedrock.data.player.PlayerRespawnState;
+import org.cloudburstmc.protocol.bedrock.data.player.armor.ArmorSlot;
+import org.cloudburstmc.protocol.bedrock.data.player.armor.ArmorSlotAndDamagePair;
+import org.cloudburstmc.protocol.bedrock.data.player.input.PlayerActionType;
+import org.cloudburstmc.protocol.bedrock.data.player.input.RewindType;
+import org.cloudburstmc.protocol.bedrock.data.positiontracking.PositionTrackingId;
+import org.cloudburstmc.protocol.bedrock.data.recipe.RecipeNetId;
+import org.cloudburstmc.protocol.bedrock.data.scoreboard.ObjectiveSortOrder;
+import org.cloudburstmc.protocol.bedrock.data.shape.PrimitiveShapeDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.data.shape.SphereDataPayload;
+import org.cloudburstmc.protocol.bedrock.data.sound.LevelSoundEvent;
+import org.cloudburstmc.protocol.bedrock.data.structure.AnimationMode;
+import org.cloudburstmc.protocol.bedrock.data.structure.Mirror;
+import org.cloudburstmc.protocol.bedrock.data.structure.Rotation;
+import org.cloudburstmc.protocol.bedrock.data.structure.StructureBlockType;
+import org.cloudburstmc.protocol.bedrock.data.structure.StructureEditorData;
+import org.cloudburstmc.protocol.bedrock.data.structure.StructureRedstoneSaveMode;
+import org.cloudburstmc.protocol.bedrock.data.structure.StructureSettings;
 import org.cloudburstmc.protocol.bedrock.data.structure.StructureTemplateRequestOperation;
 import org.cloudburstmc.protocol.bedrock.data.structure.StructureTemplateResponseType;
+import org.cloudburstmc.protocol.bedrock.data.text.AuthorAndMessage;
+import org.cloudburstmc.protocol.bedrock.data.text.DeathCauseMessageType;
+import org.cloudburstmc.protocol.bedrock.data.text.TextPacketType;
+import org.cloudburstmc.protocol.bedrock.data.world.ActorBlockSyncMessageId;
+import org.cloudburstmc.protocol.bedrock.data.world.DefaultGameType;
+import org.cloudburstmc.protocol.bedrock.data.world.Difficulty;
+import org.cloudburstmc.protocol.bedrock.data.world.Dimension;
+import org.cloudburstmc.protocol.bedrock.data.world.DimensionType;
+import org.cloudburstmc.protocol.bedrock.data.world.FeatureRegistryFeatureBinaryJsonFormat;
+import org.cloudburstmc.protocol.bedrock.data.world.GameRule;
+import org.cloudburstmc.protocol.bedrock.data.world.GameType;
+import org.cloudburstmc.protocol.bedrock.data.world.GeneratorType;
+import org.cloudburstmc.protocol.bedrock.data.world.ItemUseMethod;
+import org.cloudburstmc.protocol.bedrock.data.world.SimulationType;
+import org.cloudburstmc.protocol.bedrock.data.world.SpawnPositionType;
+import org.cloudburstmc.protocol.bedrock.data.world.event.LevelEvent;
+import org.cloudburstmc.protocol.bedrock.data.world.event.ParticleType;
 import org.cloudburstmc.protocol.bedrock.packet.ActorEventPacket;
 import org.cloudburstmc.protocol.bedrock.packet.ActorPickRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.AddBehaviorTreePacket;
@@ -264,7 +274,6 @@ import org.cloudburstmc.protocol.bedrock.packet.UpdatePlayerGameTypePacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateSoftEnumPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateSubChunkBlocksPacket;
 import org.cloudburstmc.protocol.bedrock.packet.UpdateTradePacket;
-import org.cloudburstmc.protocol.common.util.OptionalBoolean;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -360,7 +369,6 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
             this.testLabTable(proxy);
             this.testRemoveObjective(proxy);
             this.testUpdateBlockSynced(proxy);
-            this.testMoveActorDelta(proxy);
             this.testUpdateSoftEnum(proxy);
             this.testSpawnParticleEffect(proxy);
             this.testLevelEventGeneric(proxy);
@@ -429,7 +437,6 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
             this.testClientMovementPredictionSync(proxy);
             this.testPlayerVideoCapture(proxy);
             this.testPlayerUpdateEntityOverrides(proxy);
-            this.testPlayerLocation(proxy);
             this.testClientboundControlSchemeSet(proxy);
             this.testPrimitiveShapes(proxy);
         }
@@ -497,7 +504,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setPlatformChatId("");
         packet.setPosition(proxy.getPlayer().getPosition());
         packet.setVelocity(Vector3f.ZERO);
-        packet.setRotation(proxy.getPlayer().getRotation());
+        packet.setRotation(proxy.getPlayer().getRotation().toVector2());
         packet.setCarriedItem(ItemData.AIR);
         packet.setPlayerGameType(GameType.CREATIVE);
         packet.getAbilitiesData().setTargetPlayerRawId(actorId);
@@ -562,7 +569,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testLevelEvent(BedrockDebuggerProxy proxy) {
         final LevelEventPacket packet = new LevelEventPacket();
-        packet.setType(LevelEvent.SOUND_TOTEM_USED);
+        packet.setEventId(LevelEvent.SOUND_TOTEM_USED);
         packet.setPosition(proxy.getPlayer().getPosition());
         proxy.getServer().sendPacket(packet);
     }
@@ -576,26 +583,29 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testActorEvent(BedrockDebuggerProxy proxy) {
         final ActorEventPacket packet = new ActorEventPacket();
         packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
-        packet.setType(ActorEvent.HURT);
+        packet.setEventID(ActorEvent.HURT);
         proxy.getServer().sendPacket(packet);
     }
 
     private void testMobEffect(BedrockDebuggerProxy proxy) {
         final MobEffectPacket packet = new MobEffectPacket();
         packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
-        packet.setEvent(MobEffectPacket.Event.ADD);
+        packet.setEventID(MobEffectPacket.Event.ADD);
         packet.setEffectID(0);
         packet.setEffectAmplifier(0);
         packet.setShowParticles(false);
         packet.setEffectDurationTicks(40);
-        packet.setTick(0L);
+        packet.setTick(new PlayerInputTick(0L));
         proxy.getServer().sendPacket(packet);
     }
 
     private void testSetActorLink(BedrockDebuggerProxy proxy) {
+        final ActorLink actorLink = new ActorLink();
+        actorLink.setTargetA(proxy.getPlayer().getActorId());
+        actorLink.setTargetB(0L);
+        actorLink.setType(ActorLinkType.PASSENGER);
         final SetActorLinkPacket packet = new SetActorLinkPacket();
-        packet.setLink(new ActorLink(proxy.getPlayer().getActorId(), 0L,
-            ActorLinkType.PASSENGER, false, false, 0f));
+        packet.setLink(actorLink);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -618,7 +628,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testContainerSetData(BedrockDebuggerProxy proxy) {
         final ContainerSetDataPacket packet = new ContainerSetDataPacket();
         packet.setContainerID((byte) 0);
-        packet.setId(ContainerSetDataPacket.FURNACE_TICK_COUNT);
+        packet.setID(ContainerSetDataPacket.FURNACE_TICK_COUNT);
         packet.setValue(0);
         proxy.getServer().sendPacket(packet);
     }
@@ -645,7 +655,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testChangeDimension(BedrockDebuggerProxy proxy) {
         final ChangeDimensionPacket packet = new ChangeDimensionPacket();
-        packet.setDimension(DimensionType.from(Dimension.OVERWORLD));
+        packet.setDimensionID(DimensionType.from(Dimension.OVERWORLD));
         packet.setPosition(Vector3f.ZERO);
         proxy.getServer().sendPacket(packet);
     }
@@ -658,7 +668,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testSimpleEvent(BedrockDebuggerProxy proxy) {
         final SimpleEventPacket packet = new SimpleEventPacket();
-        packet.setType(SimpleEventPacket.Subtype.ENABLE_COMMANDS);
+        packet.setType(Subtype.ENABLE_COMMANDS);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -680,7 +690,10 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testGameRulesChanged(BedrockDebuggerProxy proxy) {
         final GameRulesChangedPacket packet = new GameRulesChangedPacket();
-        packet.getRulesData().getRulesList().add(new GameRuleData<>("showCoordinates", true));
+        final GameRule gameRule = new GameRule();
+        gameRule.setRuleName("showCoordinates");
+        gameRule.setRuleValue(true);
+        packet.getRuleData().getRulesList().add(gameRule);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -721,21 +734,29 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testCommandOutput(BedrockDebuggerProxy proxy) {
         final CommandOutputPacket packet = new CommandOutputPacket();
-        packet.setOriginData(new CommandOriginData(CommandOriginType.PLAYER, UUID.randomUUID(),
-            "", -1L));
-        packet.setOutputType(CommandOutputType.ALL_OUTPUT);
-        packet.setDataSet("dataSet");
+        final CommandOriginData originData = new CommandOriginData();
+        originData.setType(CommandOriginType.PLAYER);
+        originData.setUuid(UUID.randomUUID());
+        originData.setRequestId("");
+        originData.setPlayerId(-1L);
+
+        final CommandOutput output = new CommandOutput();
+        output.setOutputType(CommandOutputType.ALL_OUTPUT);
+        output.setDataSet("dataSet");
+
+        packet.setOriginData(originData);
+        packet.setOutput(output);
         proxy.getServer().sendPacket(packet);
     }
 
     private void testUpdateTrade(BedrockDebuggerProxy proxy) {
         final UpdateTradePacket packet = new UpdateTradePacket();
         packet.setContainerId((byte) 0);
-        packet.setType(ContainerType.CONTAINER);
+        packet.setType(0);
         packet.setEntityUniqueId(0);
         packet.setLastTradingPlayer(proxy.getPlayer().getActorId());
         packet.setDisplayName("DisplayName");
-        packet.setOffers(NbtMap.EMPTY);
+        packet.setData(NbtMap.EMPTY);
         packet.setUseNewTradeScreen(true);
         proxy.getServer().sendPacket(packet);
     }
@@ -745,7 +766,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setContainerId((byte) 0);
         packet.setType((short) ContainerType.HORSE.ordinal());
         packet.setEntityUniqueId(0);
-        packet.setTag(NbtMap.EMPTY);
+        packet.setData(NbtMap.EMPTY);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -780,21 +801,21 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testShowStoreOffer(BedrockDebuggerProxy proxy) {
         final ShowStoreOfferPacket packet = new ShowStoreOfferPacket();
-        packet.setProductID(UUID.fromString("bf2d5f9a-3b1b-4f1f-9001-f54479e7cd85"));
-        packet.setRedirectType(StoreOfferRedirectType.MARKETPLACE_OFFER);
+        packet.setOfferId(UUID.fromString("bf2d5f9a-3b1b-4f1f-9001-f54479e7cd85"));
+        packet.setRedirectType(ShowStoreOfferRedirectType.MARKETPLACE_OFFER);
         proxy.getServer().sendPacket(packet);
     }
 
     private void testSetLastHurtBy(BedrockDebuggerProxy proxy) {
         final SetLastHurtByPacket packet = new SetLastHurtByPacket();
-        packet.setLastHurtBy(0);
+        packet.setLastHurtBy(ActorType.CREEPER);
         proxy.getServer().sendPacket(packet);
     }
 
     private void testPhotoTransfer(BedrockDebuggerProxy proxy) {
         final PhotoTransferPacket packet = new PhotoTransferPacket();
         packet.setPhotoName("Photo");
-        packet.setPhotoData(new byte[0]);
+        packet.setPhotoData("");
         packet.setBookID("id");
         packet.setType(PhotoType.BOOK);
         packet.setSourceType(PhotoType.BOOK);
@@ -806,26 +827,26 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testModalFormRequest(BedrockDebuggerProxy proxy) {
         final ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.setFormID(0);
-        packet.setFormData("{}");
+        packet.setFormUiJson("{}");
         proxy.getServer().sendPacket(packet);
     }
 
     private void testServerSettingsResponse(BedrockDebuggerProxy proxy) {
         final ServerSettingsResponsePacket packet = new ServerSettingsResponsePacket();
         packet.setFormID(0);
-        packet.setFormData("{}");
+        packet.setFormUiJson("{}");
         proxy.getServer().sendPacket(packet);
     }
 
     private void testShowProfile(BedrockDebuggerProxy proxy) {
         final ShowProfilePacket packet = new ShowProfilePacket();
-        packet.setPlayerXUID("2535412609893193");
+        packet.setPlayerXuid("2535412609893193");
         proxy.getServer().sendPacket(packet);
     }
 
     private void testSetDefaultGameType(BedrockDebuggerProxy proxy) {
         final SetDefaultGameTypePacket packet = new SetDefaultGameTypePacket();
-        packet.setGameType(GameType.CREATIVE);
+        packet.setDefaultGameType(DefaultGameType.CREATIVE);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -863,24 +884,9 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         proxy.getServer().sendPacket(packet);
     }
 
-    private void testMoveActorDelta(BedrockDebuggerProxy proxy) {
-      /*  final MoveActorDeltaPacket packet = new MoveActorDeltaPacket();
-        packet.getData().setActorRuntimeID(proxy.getPlayer().getRuntimeId());
-        packet.setDeltaX(1);
-        packet.setDeltaY(1);
-        packet.setDeltaZ(1);
-        packet.getData().setNewPositionX(proxy.getPlayer().getPosition().getX());
-        packet.getData().setNewPositionY(proxy.getPlayer().getPosition().getY());
-        packet.getData().setNewPositionZ(proxy.getPlayer().getPosition().getZ());
-        packet.getData().setRotationX(0f);
-        packet.getData().setRotationY(0f);
-        packet.getData().setRotationYHead(0f);
-        proxy.getServer().sendPacket(packet);*/
-    }
-
     private void testUpdateSoftEnum(BedrockDebuggerProxy proxy) {
         final UpdateSoftEnumPacket packet = new UpdateSoftEnumPacket();
-        packet.setSoftEnum(new CommandEnumData("soft", Collections.emptyMap(), true));
+        packet.setEnumName("soft");
         packet.setUpdateType(SoftEnumUpdateType.ADD);
         proxy.getServer().sendPacket(packet);
     }
@@ -891,20 +897,19 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setActorId(proxy.getPlayer().getActorId());
         packet.setPosition(proxy.getPlayer().getPosition());
         packet.setEffectName("minecraft:flame");
-        packet.setMolangVariables(Optional.empty());
         proxy.getServer().sendPacket(packet);
     }
 
     private void testLevelEventGeneric(BedrockDebuggerProxy proxy) {
         final LevelEventGenericPacket packet = new LevelEventGenericPacket();
-        packet.setType(ParticleType.RED_DUST);
-        packet.setTag(NbtMap.EMPTY);
+        packet.setEventId(ParticleType.RED_DUST);
+        packet.setData(NbtMap.EMPTY);
         proxy.getServer().sendPacket(packet);
     }
 
     private void testOnScreenTextureAnimation(BedrockDebuggerProxy proxy) {
         final OnScreenTextureAnimationPacket packet = new OnScreenTextureAnimationPacket();
-        packet.setEffectId(0L);
+        packet.setEffectId(0);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -912,8 +917,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         final StructureTemplateDataResponsePacket packet =
             new StructureTemplateDataResponsePacket();
         packet.setStructureName("minecraft:village");
-        packet.setSave(false);
-        packet.setStructureNBT(NbtMap.EMPTY);
+        packet.setStructuresNbt(NbtMap.EMPTY);
         packet.setResponseType(StructureTemplateResponseType.NONE);
         proxy.getServer().sendPacket(packet);
     }
@@ -925,9 +929,11 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         educationLevelSettings.setCodeBuilderTitle("title");
         educationLevelSettings.setPostProcessFilter("filter");
         educationLevelSettings.setScreenshotBorderResourcePath("path");
-        educationLevelSettings.setAgentCapabilities(OptionalBoolean.empty());
-        educationLevelSettings.setCodeBuilderOverrideUri(Optional.empty());
-        educationLevelSettings.setExternalLinkSettings(OptionalBoolean.empty());
+        educationLevelSettings.setAgentCapabilities(new AgentCapabilities());
+        final ExternalLinkSettings externalLinkSettings = new ExternalLinkSettings();
+        externalLinkSettings.setURL("");
+        externalLinkSettings.setDisplayName("");
+        educationLevelSettings.setExternalLinkSettings(externalLinkSettings);
         packet.setEducationLevelSettings(educationLevelSettings);
         proxy.getServer().sendPacket(packet);
     }
@@ -941,16 +947,23 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testPlayerEnchantOptions(BedrockDebuggerProxy proxy) {
         final PlayerEnchantOptionsPacket packet = new PlayerEnchantOptionsPacket();
+        final ItemEnchants itemEnchants = new ItemEnchants(0);
+        itemEnchants.getItemEnchants().add(
+            List.of(new EnchantmentInstance(EnchantType.AQUA_AFFINITY, 0))
+        );
+        itemEnchants.getItemEnchants().add(
+            List.of(new EnchantmentInstance(EnchantType.SHARPNESS, 0))
+        );
+        itemEnchants.getItemEnchants().add(
+            List.of(new EnchantmentInstance(EnchantType.PROJECTILE_PROTECTION, 0))
+        );
+
         packet.getOptions().add(
-            new ItemEnchantOption(1,
-                new ItemEnchants(
-                    0,
-                    List.of(new EnchantmentInstance(0, 0)),
-                    List.of(new EnchantmentInstance(1, 0)),
-                    List.of(new EnchantmentInstance(2, 0))
-                ),
+            new ItemEnchantOption(
+                1,
+                itemEnchants,
                 "minecraft:test_enchant",
-                1337
+                new RecipeNetId(1337)
             )
         );
         proxy.getServer().sendPacket(packet);
@@ -959,9 +972,11 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testPlayerArmorDamage(BedrockDebuggerProxy proxy) {
         final PlayerArmorDamagePacket packet = new PlayerArmorDamagePacket();
         for (int i = 0; i < 5; i++) {
-            packet.getDamageForSlot()[i] = 0;
+            final ArmorSlotAndDamagePair pair = new ArmorSlotAndDamagePair();
+            pair.setArmorSlot(ArmorSlot.from(i));
+            pair.setDamage(0);
+            packet.getArmorSlotAndDamagePairs().add(pair);
         }
-        packet.getFlags().addAll(List.of(PlayerArmorDamageFlag.values()));
         proxy.getServer().sendPacket(packet);
     }
 
@@ -976,7 +991,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         final PositionTrackingDBServerBroadcastPacket packet =
             new PositionTrackingDBServerBroadcastPacket();
         packet.setAction(PositionTrackingDBServerBroadcastPacket.Action.NOT_FOUND);
-        packet.setTrackingId(0);
+        packet.setId(new PositionTrackingId(0));
         packet.setPositionTrackingData(NbtMap.EMPTY);
         proxy.getServer().sendPacket(packet);
     }
@@ -1023,8 +1038,8 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setPos(proxy.getPlayer().getPosition());
         packet.setPosDelta(Vector3f.ZERO);
         packet.setOnGround(true);
-        packet.setPredictionType(PredictionType.VEHICLE);
-        packet.setVehicleRotation(Vector2f.ZERO);
+        packet.setPredictionType(RewindType.VEHICLE);
+        packet.setRotation(Vector2f.ZERO);
         packet.setVehicleAngularVelocity(1.0f);
         proxy.getServer().sendPacket(packet);
     }
@@ -1035,7 +1050,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
         final DebugMarkerData data = new DebugMarkerData();
         data.setText("debugMarkerText");
-        data.setColor(Color.RED.getRGB());
+        data.setColor(Color.RED);
         data.setPosition(Vector3f.ZERO);
 
         packet.setDebugMarkerData(data);
@@ -1050,9 +1065,9 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testAddVolumeEntity(BedrockDebuggerProxy proxy) {
         final AddVolumeEntityPacket packet = new AddVolumeEntityPacket();
-        packet.setEntityNetworkId(1337);
+        packet.setEntityNetworkId(new EntityNetId(1337));
         packet.setComponents(NbtMap.EMPTY);
-        packet.setIdentifier("minecraft:test");
+        packet.setJsonIdentifier("minecraft:test");
         packet.setInstanceName("instanceName");
         packet.setMinBounds(Vector3i.ZERO);
         packet.setMaxBounds(Vector3i.ZERO);
@@ -1063,7 +1078,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testRemoveVolumeEntity(BedrockDebuggerProxy proxy) {
         final RemoveVolumeEntityPacket packet = new RemoveVolumeEntityPacket();
-        packet.setEntityNetworkId(1337);
+        packet.setEntityNetworkId(new EntityNetId(1337));
         packet.setDimensionType(DimensionType.from(Dimension.OVERWORLD));
         proxy.getServer().sendPacket(packet);
     }
@@ -1076,18 +1091,22 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testNpcDialogue(BedrockDebuggerProxy proxy) {
         final NpcDialoguePacket packet = new NpcDialoguePacket();
-        packet.setNpcId(0);
-        packet.setActionType(NpcDialoguePacket.Action.CLOSE);
+        packet.setNpcIdRawId(0);
+        packet.setNpcDialogueActionType(NpcDialogueActionType.CLOSE);
         packet.setDialogue("dialogue");
         packet.setSceneName("scene");
         packet.setNpcName("npc");
-        packet.setActionJson("");
+        packet.setActionJson("{}");
         proxy.getServer().sendPacket(packet);
     }
 
     private void testEduUriResource(BedrockDebuggerProxy proxy) {
+        final EduSharedUriResource eduSharedUriResource = new EduSharedUriResource();
+        eduSharedUriResource.setButtonName("");
+        eduSharedUriResource.setLinkUri("");
+
         final EduUriResourcePacket packet = new EduUriResourcePacket();
-        packet.setEduSharedUriResource(EduSharedUriResource.EMPTY);
+        packet.setEduSharedURIResource(eduSharedUriResource);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -1099,13 +1118,13 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     }
 
     private void testUpdateSubChunkBlocks(BedrockDebuggerProxy proxy) {
-        final UpdateSubChunkBlocksPacket packet = new UpdateSubChunkBlocksPacket();
+       /* final UpdateSubChunkBlocksPacket packet = new UpdateSubChunkBlocksPacket();
         packet.setSubChunkBlockPosition(Vector3i.ZERO);
         packet.getStandardBlocks().add(new BlockChangeEntry(Vector3i.ZERO, () -> 0, 0, 0L,
             ActorBlockSyncMessageId.NONE));
         packet.getExtraBlocks().add(new BlockChangeEntry(Vector3i.ZERO, () -> 0, 0, 0L,
             ActorBlockSyncMessageId.NONE));
-        proxy.getServer().sendPacket(packet);
+        proxy.getServer().sendPacket(packet);*/
     }
 
     private void testPlayerStartItemCooldown(BedrockDebuggerProxy proxy) {
@@ -1148,7 +1167,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testAgentActionEvent(BedrockDebuggerProxy proxy) {
         final AgentActionEventPacket packet = new AgentActionEventPacket();
         packet.setRequestId("requestID");
-        packet.setAction(AgentActionType.NONE);
+        packet.setAction(AgentActionType.ATTACK);
         packet.setResponse("");
         proxy.getServer().sendPacket(packet);
     }
@@ -1176,9 +1195,12 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     }
 
     private void testDeathInfo(BedrockDebuggerProxy proxy) {
+        final DeathCauseMessageType message = new DeathCauseMessageType();
+        message.setDeathCauseAttackName("test");
+        message.getDeathCauseMessageList().add("test1");
+
         final DeathInfoPacket packet = new DeathInfoPacket();
-        packet.setDeathCauseAttackName("attackName");
-        packet.getDeathCauseMessageList().add("test");
+        packet.setDeathCauseMessage(message);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -1190,8 +1212,13 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     }
 
     private void testFeatureRegistry(BedrockDebuggerProxy proxy) {
+        final FeatureRegistryFeatureBinaryJsonFormat format =
+            new FeatureRegistryFeatureBinaryJsonFormat();
+        format.setFeatureName("minecraft:feature");
+        format.setBinaryJsonOutput("");
+
         final FeatureRegistryPacket packet = new FeatureRegistryPacket();
-        packet.getFeaturesDataList().add(new FeatureDefinition("minecraft:feature", ""));
+        packet.getFeaturesDataList().add(format);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -1215,7 +1242,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testUnlockedRecipes(BedrockDebuggerProxy proxy) {
         final UnlockedRecipesPacket packet = new UnlockedRecipesPacket();
-        packet.setType(UnlockedRecipesPacket.UnlockedRecipesPacketType.REMOVE_ALL);
+        packet.setType(UnlockedRecipesPacket.PacketType.REMOVE_ALL_UNLOCKED_RECIPES);
         packet.getUnlockedRecipesList().add("minecraft:acacia_button");
         proxy.getServer().sendPacket(packet);
     }
@@ -1247,7 +1274,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testLevelSoundEvent(BedrockDebuggerProxy proxy) {
         final LevelSoundEventPacket packet = new LevelSoundEventPacket();
-        packet.setSoundEvent(SoundEvent.ADMIRE);
+        packet.setSound(LevelSoundEvent.ADMIRE);
         packet.setPosition(Vector3f.ZERO);
         packet.setActorIdentifier("");
         proxy.getServer().sendPacket(packet);
@@ -1317,12 +1344,29 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     }
 
     private void testUpdateAttributes(BedrockDebuggerProxy proxy) {
+        final AttributeData attributeData = new AttributeData();
+        attributeData.setMinValue(-1024);
+        attributeData.setMaxValue(1024);
+        attributeData.setCurrentValue(1024);
+        attributeData.setDefaultMinValue(-1024);
+        attributeData.setDefaultMaxValue(1024);
+        attributeData.setName("minecraft:luck");
+        attributeData.getModifiers().add(
+            new AttributeModifier(
+                "minecraft:test",
+                "test",
+                1,
+                AttributeModifierOperation.OPERATION_ADDITION,
+                AttributeOperands.OPERAND_MIN,
+                true
+            )
+        );
+
         final UpdateAttributesPacket packet = new UpdateAttributesPacket();
-        packet.setRuntimeID(proxy.getPlayer().getRuntimeId());
-        packet.setAttributeList(List.of(new AttributeData("minecraft:luck", -1024, 1024, 0, 0,
-            List.of(new AttributeModifier("minecraft:test", "test", 1,
-                AttributeModifierOperation.OPERATION_ADDITION, AttributeOperands.OPERAND_MIN,
-                true)))));
+        packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
+        packet.getAttributeList().add(attributeData);
+        packet.setTick(new PlayerInputTick(0L));
+
         proxy.getServer().sendPacket(packet);
     }
 
@@ -1341,14 +1385,14 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testAgentAnimation(BedrockDebuggerProxy proxy) {
         final AgentAnimationPacket packet = new AgentAnimationPacket();
-        packet.setAgentAnimation((byte) 0);
+        packet.setAgentAnimation(AgentAnimation.ARM_SWING);
         packet.setRuntimeId(proxy.getPlayer().getRuntimeId());
         proxy.getServer().sendPacket(packet);
     }
 
     private void testSetHud(BedrockDebuggerProxy proxy) {
         final SetHudPacket packet = new SetHudPacket();
-        packet.getHudElementList().addAll(List.of(HudElement.values()));
+        packet.getHudElement().addAll(List.of(HudElement.values()));
         packet.setHudVisible(HudVisibility.RESET);
         proxy.getServer().sendPacket(packet);
     }
@@ -1429,7 +1473,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testAnimate(BedrockDebuggerProxy proxy) {
         final AnimatePacket packet = new AnimatePacket();
-        packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
+        packet.setTargetActorRuntimeID(proxy.getPlayer().getRuntimeId());
         packet.setAction(AnimatePacket.Action.SWING);
         proxy.getClient().sendPacket(packet);
     }
@@ -1437,7 +1481,10 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testMapInfoRequest(BedrockDebuggerProxy proxy) {
         final MapInfoRequestPacket packet = new MapInfoRequestPacket();
         packet.setMapUniqueID(999L);
-        packet.getClientPixelsList().add(new MapPixel(10, 1));
+        final ClientPixelsProxy pixel = new ClientPixelsProxy();
+        pixel.setPixel(10);
+        pixel.setIndex(1);
+        packet.getClientPixelsList().add(pixel);
         proxy.getClient().sendPacket(packet);
     }
 
@@ -1470,10 +1517,10 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     }
 
     private void testBookEdit(BedrockDebuggerProxy proxy) {
-        final BookEditAction.Finalize finalize = new BookEditAction.Finalize();
+        final Finalize finalize = new Finalize();
         finalize.setTitle("Title");
         finalize.setAuthor("Author");
-        finalize.setXuid("");
+        finalize.setXUID("");
 
         final BookEditPacket packet = new BookEditPacket();
         packet.setBookSlot(0);
@@ -1494,7 +1541,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testModalFormResponse(BedrockDebuggerProxy proxy) {
         final ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.setFormID(0);
-        packet.setFormData("");
+        packet.setFormUiJson("");
         proxy.getClient().sendPacket(packet);
     }
 
@@ -1549,14 +1596,14 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testAnvilDamage(BedrockDebuggerProxy proxy) {
         final AnvilDamagePacket packet = new AnvilDamagePacket();
-        packet.setDamageAmount(1);
+        packet.setDamage(1);
         packet.setBlockPosition(Vector3i.ZERO);
         proxy.getClient().sendPacket(packet);
     }
 
     private void testCodeBuilder(BedrockDebuggerProxy proxy) {
         final CodeBuilderPacket packet = new CodeBuilderPacket();
-        packet.setUrl("https://minecraft.net");
+        packet.setURL("https://minecraft.net");
         proxy.getClient().sendPacket(packet);
     }
 
@@ -1569,24 +1616,24 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testCodeBuilderSource(BedrockDebuggerProxy proxy) {
         final CodeBuilderSourcePacket packet = new CodeBuilderSourcePacket();
-        packet.setOperation(CodeBuilderOperationType.GET);
-        packet.setCategory(CodeBuilderCategoryType.CODE_STATUS);
-        packet.setCodeStatus(CodeBuilderCodeStatus.SUCCEEDED);
+        packet.setOperation(CodeBuilderStorageQueryOptionsOperation.NONE);
+        packet.setCategory(CodeBuilderStorageQueryOptionsCategory.CODE_STATUS);
+        packet.setCodeStatus(CodeBuilderExecutionStateCodeStatus.SUCCEEDED);
         proxy.getClient().sendPacket(packet);
     }
 
     private void testRequestAbility(BedrockDebuggerProxy proxy) {
         final RequestAbilityPacket packet = new RequestAbilityPacket();
         packet.setAbility(AbilitiesIndex.BUILD);
-        packet.setValueType(AbilitiesIndex.Type.BOOLEAN);
-        packet.setBoolValue(true);
+        packet.setValueType(RequestAbilityPacket.Type.BOOL);
+        packet.setBool(true);
         proxy.getClient().sendPacket(packet);
     }
 
     private void testRequestPermissions(BedrockDebuggerProxy proxy) {
         final RequestPermissionsPacket packet = new RequestPermissionsPacket();
         packet.setPlayerPermissionLevel(PlayerPermissionLevel.OPERATOR);
-        packet.setTargetPlayerId(proxy.getPlayer().getActorId());
+        packet.setTargetPlayerIdsRawID(proxy.getPlayer().getActorId());
         proxy.getClient().sendPacket(packet);
     }
 
@@ -1605,91 +1652,21 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testPlayerToggleCrafterSlotRequest(BedrockDebuggerProxy proxy) {
         final PlayerToggleCrafterSlotRequestPacket packet =
             new PlayerToggleCrafterSlotRequestPacket();
-        packet.setPos(Vector3i.ZERO);
         proxy.getClient().sendPacket(packet);
     }
 
     private void testSetPlayerInventoryOptions(BedrockDebuggerProxy proxy) {
+        final InventoryOptions inventoryOptions = new InventoryOptions();
+        inventoryOptions.setLeftInventoryTab(InventoryLeftTabIndex.SURVIVAL);
+        inventoryOptions.setRightInventoryTab(InventoryRightTabIndex.ARMOR);
+        inventoryOptions.setLayoutInv(InventoryLayout.DEFAULT);
+        inventoryOptions.setLayoutCraft(InventoryLayout.DEFAULT);
+
         final SetPlayerInventoryOptionsPacket packet = new SetPlayerInventoryOptionsPacket();
-        packet.setLeftInventoryTab(InventoryLeftTabIndex.SURVIVAL);
-        packet.setRightInventoryTab(InventoryRightTabIndex.ARMOR);
-        packet.setLayoutInv(InventoryLayout.DEFAULT);
-        packet.setLayoutCraft(InventoryLayout.DEFAULT);
+        packet.setInventoryOptions(inventoryOptions);
+
         proxy.getClient().sendPacket(packet);
     }
-
-    /*private void testInventoryTransaction(BedrockDebuggerProxy proxy) {
-        final InventoryTransactionPacket packet = new InventoryTransactionPacket();
-        packet.getLegacySetItemSlots()
-            .add(
-                new LegacySetSlot(
-                    ContainerEnumName.ANVIL_INPUT_CONTAINER, new byte[]{0}
-                )
-            );
-
-        final InventorySource source = new InventorySource();
-        source.setSourceType(InventorySourceType.GLOBAL_INVENTORY);
-        source.setContainerID(0);
-        source.setBitFlags(InventorySourceFlags.NO_FLAG);
-
-        final InventoryAction action = new InventoryAction();
-        action.setSource(source);
-        action.setSlot(0);
-        action.setFromItem(ItemData.AIR);
-        action.setToItem(ItemData.AIR);
-
-        final InventoryTransaction transaction = new InventoryTransaction();
-        transaction.getActions().add(action);
-
-        final NormalTransactionData normalTransactionData = new NormalTransactionData();
-        normalTransactionData.getActions().add(transaction);
-
-        packet.setTransaction(normalTransactionData);
-
-        proxy.getClient().sendPacket(packet);
-    }*/
-
-    /*private void testItemStackRequest(BedrockDebuggerProxy proxy) {
-        final ItemStackRequestPacket packet = new ItemStackRequestPacket();
-        final int requestId = 5131;
-        final ItemStackRequestSlotData slotData = new ItemStackRequestSlotData(
-            ContainerEnumName.ANVIL_INPUT_CONTAINER, 0, 0,
-            new FullContainerName(ContainerEnumName.ANVIL_INPUT_CONTAINER, null));
-
-        final AutoCraftRecipeAction autoCraftRecipeAction = new AutoCraftRecipeAction(0, 0,
-            Collections.singletonList(ItemDescriptorWithCount.EMPTY), 0);
-        final BeaconPaymentAction beaconPaymentAction = new BeaconPaymentAction(0, 0);
-        final ConsumeAction consumeAction = new ConsumeAction(0, slotData);
-        final CraftCreativeAction craftCreativeAction = new CraftCreativeAction(0, 0);
-        final CraftGrindstoneAction craftGrindstoneAction = new CraftGrindstoneAction(0, 0, 0);
-        final CraftLoomAction craftLoomAction = new CraftLoomAction("bo", 0);
-        final CraftRecipeAction craftRecipeAction = new CraftRecipeAction(0, 0);
-        final CraftRecipeOptionalAction craftRecipeOptionalAction =
-            new CraftRecipeOptionalAction(0, 0);
-        final CraftResultsDeprecatedAction craftResultsDeprecatedAction =
-            new CraftResultsDeprecatedAction(Collections.singleton(ItemData.AIR)
-                .toArray(ItemData[]::new), 0);
-        final CreateAction createAction = new CreateAction(0);
-        final DestroyAction destroyAction = new DestroyAction(0, slotData);
-        final DropAction dropAction = new DropAction(0, slotData, false);
-        final LabTableCombineAction labTableCombineAction = new LabTableCombineAction();
-        final MineBlockAction mineBlockAction = new MineBlockAction(0, 0, 0);
-        final PlaceAction placeAction = new PlaceAction(0, slotData, slotData);
-        final SwapAction swapAction = new SwapAction(slotData, slotData);
-        final TakeAction takeAction = new TakeAction(0, slotData, slotData);
-
-        final ItemStackRequest request = new ItemStackRequest(requestId,
-            Arrays.asList(autoCraftRecipeAction, beaconPaymentAction, consumeAction,
-                craftCreativeAction, craftGrindstoneAction, craftLoomAction, craftRecipeAction,
-                craftRecipeOptionalAction, craftResultsDeprecatedAction, createAction, destroyAction
-                , dropAction, labTableCombineAction, mineBlockAction, placeAction, swapAction,
-                takeAction).toArray(new ItemStackRequestAction[0]),
-            new String[0], TextProcessingEventOrigin.SERVER_CHAT_PUBLIC);
-
-        packet.getRequests().add(request);
-
-        proxy.getClient().sendPacket(packet);
-    }*/
 
     private void testContainerRegistryCleanup(BedrockDebuggerProxy proxy) {
         proxy.getServer().sendPacket(new ContainerRegistryCleanupPacket());
@@ -1700,7 +1677,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setViewAngle(Vector2f.ZERO);
         packet.setDistance(1f);
         packet.setTargetMode(CameraAimAssistPacket.TargetMode.DISTANCE);
-        packet.setAction(AimAssistAction.CLEAR);
+        packet.setAction(CameraAimAssistPacket.Action.CLEAR);
         packet.setPresetId("");
         proxy.getServer().sendPacket(packet);
     }
@@ -1708,28 +1685,27 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testMovementEffect(BedrockDebuggerProxy proxy) {
         final MovementEffectPacket packet = new MovementEffectPacket();
         packet.setTargetRuntimeID(proxy.getPlayer().getRuntimeId());
-        packet.setEffectType(MovementEffectType.GLIDE_BOOST);
+        packet.setEffectID(MovementEffectType.GLIDE_BOOST);
         packet.setEffectDuration(1);
         proxy.getServer().sendPacket(packet);
     }
 
     private void testClientMovementPredictionSync(BedrockDebuggerProxy proxy) {
         final ClientMovementPredictionSyncPacket packet = new ClientMovementPredictionSyncPacket();
-        packet.getFlags().add(ActorFlags.ON_FIRE);
-        packet.setActorBoundingBox(Vector3f.from(1f, 1f, 1f));
-        packet.setMovementSpeed(0.1f);
-        packet.setUnderwaterMovementSpeed(0.1f);
-        packet.setLavaMovementSpeed(0.1f);
-        packet.setJumpStrength(1f);
-        packet.setHealth(20f);
-        packet.setHunger(20f);
+        packet.getActorBoundingBox().setActorDataBoundingBox(Vector3f.from(1f, 1f, 1f));
+        packet.getMovementAttributes().setMovementSpeed(0.1f);
+        packet.getMovementAttributes().setUnderwaterMovementSpeed(0.1f);
+        packet.getMovementAttributes().setLavaMovementSpeed(0.1f);
+        packet.getMovementAttributes().setJumpStrength(1f);
+        packet.getMovementAttributes().setHealth(20f);
+        packet.getMovementAttributes().setHunger(20f);
         packet.setActorID(proxy.getPlayer().getActorId());
         proxy.getServer().sendPacket(packet);
     }
 
     private void testUpdateClientOptions(BedrockDebuggerProxy proxy) {
         final UpdateClientOptionsPacket packet = new UpdateClientOptionsPacket();
-        packet.setGraphicsMode(GraphicsMode.FANCY);
+        packet.setGraphicsModeChange(GraphicsMode.FANCY);
         proxy.getClient().sendPacket(packet);
     }
 
@@ -1746,14 +1722,6 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
         packet.setUpdateType(PlayerUpdateEntityOverridesPacket.UpdateType.CLEAR_OVERRIDES);
         packet.setTargetID(-1);
         proxy.getServer().sendPacket(packet);
-    }
-
-    private void testPlayerLocation(BedrockDebuggerProxy proxy) {
-       /* final PlayerLocationPacket packet = new PlayerLocationPacket();
-        packet.setType(PlayerLocationPacket.Type.PLAYER_LOCATION_COORDINATES);
-        packet.setTargetActorID(-1L);
-        packet.setPosition(Vector3f.ZERO);
-        proxy.getServer().sendPacket(packet);*/
     }
 
     private void testClientboundControlSchemeSet(BedrockDebuggerProxy proxy) {

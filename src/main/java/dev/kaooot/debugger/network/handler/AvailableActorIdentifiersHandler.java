@@ -15,7 +15,7 @@ public class AvailableActorIdentifiersHandler
 
     @Override
     public PacketSignal handle(AvailableActorIdentifiersPacket packet, BedrockDebuggerProxy proxy) {
-        proxy.getPlayer().setActorInfoList(packet.getActorInfoList());
+        proxy.getPlayer().setActorInfoList(packet.getIdentifierList());
         return PacketSignal.UNHANDLED;
     }
 }

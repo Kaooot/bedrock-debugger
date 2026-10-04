@@ -35,8 +35,8 @@ public class AddPlayerHandler implements PacketHandler<AddPlayerPacket> {
             player.renderBounds(settingsConfig);
         }
 
-        if (packet.getActorData().containsKey(ActorDataTypes.NAME)) {
-            player.setNameTag(packet.getActorData().get(ActorDataTypes.NAME));
+        if (packet.getEntityData().containsKey(ActorDataTypes.NAME)) {
+            player.setNameTag((String) packet.getEntityData().get(ActorDataTypes.NAME));
         }
 
         proxy.getPlayers().add(player);

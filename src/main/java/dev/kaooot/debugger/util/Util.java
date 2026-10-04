@@ -4,6 +4,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Converter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dev.kaooot.debugger.BedrockDebuggerProxy;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.ByteArrayOutputStream;
@@ -21,23 +22,21 @@ import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
 import org.cloudburstmc.nbt.NbtType;
 import org.cloudburstmc.nbt.NbtUtils;
-import org.cloudburstmc.protocol.bedrock.data.BuildPlatform;
-import org.cloudburstmc.protocol.bedrock.data.ClientPlayMode;
-import org.cloudburstmc.protocol.bedrock.data.ControlScheme;
-import org.cloudburstmc.protocol.bedrock.data.InputInteractionModel;
-import org.cloudburstmc.protocol.bedrock.data.InputMode;
-import org.cloudburstmc.protocol.bedrock.data.PlatformType;
-import org.cloudburstmc.protocol.bedrock.data.TrimMaterial;
-import org.cloudburstmc.protocol.bedrock.data.TrimPattern;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraAimAssistCategory;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraAimAssistItemSettings;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraAimAssistPreset;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraAimAssistPresetDefinition;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraAimAssistPriority;
-import org.cloudburstmc.protocol.bedrock.data.camera.CameraPreset;
+import org.cloudburstmc.protocol.bedrock.data.camera.CameraPresets;
+import org.cloudburstmc.protocol.bedrock.data.camera.aimassist.CameraAimAssistCategoryDefinition;
+import org.cloudburstmc.protocol.bedrock.data.camera.aimassist.CameraAimAssistCommandDefinition;
+import org.cloudburstmc.protocol.bedrock.data.camera.aimassist.CameraAimAssistItemSettings;
+import org.cloudburstmc.protocol.bedrock.data.camera.aimassist.CameraAimAssistPresetDefinition;
+import org.cloudburstmc.protocol.bedrock.data.connection.BuildPlatform;
+import org.cloudburstmc.protocol.bedrock.data.connection.PlatformType;
 import org.cloudburstmc.protocol.bedrock.data.definitions.ItemDefinition;
 import org.cloudburstmc.protocol.bedrock.data.definitions.SimpleItemDefinition;
-import dev.kaooot.debugger.BedrockDebuggerProxy;
+import org.cloudburstmc.protocol.bedrock.data.player.ControlScheme;
+import org.cloudburstmc.protocol.bedrock.data.player.input.ClientPlayMode;
+import org.cloudburstmc.protocol.bedrock.data.player.input.InputMode;
+import org.cloudburstmc.protocol.bedrock.data.player.input.NewInteractionModel;
+import org.cloudburstmc.protocol.bedrock.data.recipe.TrimMaterial;
+import org.cloudburstmc.protocol.bedrock.data.recipe.TrimPattern;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -53,11 +52,11 @@ public class Util {
         new Object2ObjectOpenHashMap<>();
     private final Map<PlatformType, ClientPlayMode> CLIENT_PLAY_MODE_MAP =
         new Object2ObjectOpenHashMap<>();
-    private final Map<PlatformType, InputInteractionModel> INPUT_INTERACTION_MODEL_MAP =
+    private final Map<PlatformType, NewInteractionModel> INPUT_INTERACTION_MODEL_MAP =
         new Object2ObjectOpenHashMap<>();
 
     static {
-        BUILD_PLATFORM_MAP.put(PlatformType.DESKTOP, BuildPlatform.WIN_32);
+        BUILD_PLATFORM_MAP.put(PlatformType.DESKTOP, BuildPlatform.WIN32);
         BUILD_PLATFORM_MAP.put(PlatformType.CONSOLE, BuildPlatform.XBOX);
         BUILD_PLATFORM_MAP.put(PlatformType.MOBILE, BuildPlatform.GOOGLE);
 
@@ -69,9 +68,9 @@ public class Util {
         CLIENT_PLAY_MODE_MAP.put(PlatformType.CONSOLE, ClientPlayMode.SCREEN);
         CLIENT_PLAY_MODE_MAP.put(PlatformType.MOBILE, ClientPlayMode.NORMAL);
 
-        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.DESKTOP, InputInteractionModel.CLASSIC);
-        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.CONSOLE, InputInteractionModel.CLASSIC);
-        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.MOBILE, InputInteractionModel.TOUCH);
+        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.DESKTOP, NewInteractionModel.CLASSIC);
+        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.CONSOLE, NewInteractionModel.CLASSIC);
+        INPUT_INTERACTION_MODEL_MAP.put(PlatformType.MOBILE, NewInteractionModel.TOUCH);
     }
 
     public final Converter<String, String> CONVERTER = CaseFormat.UPPER_UNDERSCORE
@@ -124,7 +123,7 @@ public class Util {
         return CLIENT_PLAY_MODE_MAP.get(type);
     }
 
-    public InputInteractionModel getInputInteractionModel(PlatformType type) {
+    public NewInteractionModel getNewInteractionModel(PlatformType type) {
         return INPUT_INTERACTION_MODEL_MAP.get(type);
     }
 
@@ -256,25 +255,25 @@ public class Util {
             .build();
     }
 
-    public NbtMap convertCameraPresetsToNbt(List<CameraPreset> presets) {
+    public NbtMap convertCameraPresetsToNbt(List<CameraPresets> presets) {
         final List<NbtMap> cameraPresets = new ObjectArrayList<>();
-        for (final CameraPreset preset : presets) {
+        for (final CameraPresets preset : presets) {
             final NbtMapBuilder builder = NbtMap.builder().putString("name", preset.getName());
             if (!preset.getInheritFrom().isEmpty()) {
                 builder.putString("inheritFrom", preset.getInheritFrom());
             }
-            if (preset.getPos() != null) {
+            if (preset.getPosX() != null) {
                 builder.putCompound("pos", NbtMap.builder()
-                    .putFloat("x", preset.getPos().getX())
-                    .putFloat("y", preset.getPos().getY())
-                    .putFloat("z", preset.getPos().getZ())
+                    .putFloat("x", preset.getPosX())
+                    .putFloat("y", preset.getPosY())
+                    .putFloat("z", preset.getPosZ())
                     .build());
             }
-            if (preset.getYaw() != null) {
-                builder.putFloat("yaw", preset.getYaw());
+            if (preset.getRotX() != null) {
+                builder.putFloat("pitch", preset.getRotX());
             }
-            if (preset.getPitch() != null) {
-                builder.putFloat("pitch", preset.getPitch());
+            if (preset.getRotY() != null) {
+                builder.putFloat("yaw", preset.getRotY());
             }
             if (preset.getRotationSpeed() != null) {
                 builder.putFloat("rotationSpeed", preset.getRotationSpeed());
@@ -336,7 +335,7 @@ public class Util {
                 builder.putBoolean("alignTargetAndCameraForward",
                     preset.getAlignTargetAndCameraForward().getAsBoolean());
             }
-            final CameraAimAssistPreset aimAssist = preset.getAimAssist();
+            final CameraAimAssistCommandDefinition aimAssist = preset.getAimAssist();
             if (aimAssist != null) {
                 final NbtMapBuilder b = NbtMap.builder();
 
@@ -344,7 +343,7 @@ public class Util {
                     b.putString("presetId", aimAssist.getPresetId());
                 }
                 if (aimAssist.getTargetMode() != null) {
-                    b.putInt("targetMode", aimAssist.getTargetMode());
+                    b.putInt("targetMode", aimAssist.getTargetMode().ordinal());
                 }
                 if (aimAssist.getViewAngle() != null) {
                     b.putCompound("viewAngle", NbtMap.builder()
@@ -369,36 +368,47 @@ public class Util {
     }
 
     public List<NbtMap> convertCameraAimAssistCategoriesToNbt(
-        List<CameraAimAssistCategory> categories) {
+        List<CameraAimAssistCategoryDefinition> categories) {
         final List<NbtMap> categoriesList = new ObjectArrayList<>();
-        for (final CameraAimAssistCategory category : categories) {
+        for (final CameraAimAssistCategoryDefinition category : categories) {
             final NbtMapBuilder categoryBuilder = NbtMap.builder()
                 .putString("name", category.getName());
 
             final List<NbtMap> entities = new ObjectArrayList<>();
-            for (final CameraAimAssistPriority entity : category.getEntities()) {
-                entities.add(NbtMap.builder().putString("itemId", entity.getId())
-                    .putInt("priority", entity.getPriority())
+            for (final Map.Entry<String, Integer> entity :
+                category.getPriorities().getEntities().entrySet()) {
+                entities.add(NbtMap.builder().putString("itemId", entity.getKey())
+                    .putInt("priority", entity.getValue())
                     .build());
             }
 
             final List<NbtMap> blocks = new ObjectArrayList<>();
-            for (final CameraAimAssistPriority block : category.getBlocks()) {
-                blocks.add(NbtMap.builder().putString("blockId", block.getId())
-                    .putInt("priority", block.getPriority())
+            for (final Map.Entry<String, Integer> block :
+                category.getPriorities().getEntities().entrySet()) {
+                blocks.add(NbtMap.builder().putString("blockId", block.getKey())
+                    .putInt("priority", block.getValue())
                     .build());
             }
+
+            // TODO add block tags
+            // TODO add entity type families
 
             final NbtMapBuilder prioritiesBuilder = NbtMap.builder()
                 .putList("entities", NbtType.COMPOUND, entities)
                 .putList("blocks", NbtType.COMPOUND, blocks);
 
-            if (category.getEntityDefault() != null) {
-                prioritiesBuilder.putInt("entityDefault", category.getEntityDefault());
+            if (category.getPriorities().getEntityDefault() != null) {
+                prioritiesBuilder.putInt(
+                    "entityDefault",
+                    category.getPriorities().getEntityDefault()
+                );
             }
 
-            if (category.getBlockDefault() != null) {
-                prioritiesBuilder.putInt("blockDefault", category.getBlockDefault());
+            if (category.getPriorities().getBlockDefault() != null) {
+                prioritiesBuilder.putInt(
+                    "blockDefault",
+                    category.getPriorities().getBlockDefault()
+                );
             }
 
             categoryBuilder.putCompound("priorities", prioritiesBuilder.build());
@@ -414,7 +424,8 @@ public class Util {
         for (final CameraAimAssistPresetDefinition preset : presets) {
             final NbtMapBuilder builder = NbtMap.builder()
                 .putString("identifier", preset.getIdentifier())
-                .putList("exclusionList", NbtType.STRING, preset.getExclusionList())
+//                .putList("exclusionList", NbtType.STRING, preset.getExclusionList())
+                // TODO add exclusion settings
                 .putList("liquidTargetingList", NbtType.STRING, preset.getLiquidTargetingList());
 
             final List<NbtMap> itemSettingsList = new ObjectArrayList<>();

@@ -19,10 +19,10 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cloudburstmc.math.vector.Vector3f;
-import org.cloudburstmc.protocol.bedrock.data.Dimension;
-import org.cloudburstmc.protocol.bedrock.data.GeneratorType;
 import org.cloudburstmc.protocol.bedrock.data.definitions.DimensionDefinition;
-import org.cloudburstmc.protocol.bedrock.data.payload.common.DimensionType;
+import org.cloudburstmc.protocol.bedrock.data.world.Dimension;
+import org.cloudburstmc.protocol.bedrock.data.world.DimensionType;
+import org.cloudburstmc.protocol.bedrock.data.world.GeneratorType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.

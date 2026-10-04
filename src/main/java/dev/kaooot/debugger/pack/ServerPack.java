@@ -5,7 +5,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cloudburstmc.protocol.bedrock.data.PackType;
+import org.cloudburstmc.protocol.bedrock.data.resourcepack.PackType;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
