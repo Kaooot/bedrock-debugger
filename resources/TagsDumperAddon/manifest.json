@@ -1,8 +1,8 @@
 {
   "format_version": 2,
   "header": {
-    "name": "BlockPaletteDumper",
-    "description": "Dumps the block palette.",
+    "name": "TagsDumper",
+    "description": "Dumps block and item tags.",
     "uuid": "14e467b4-e3aa-49d3-8352-f8439fd7b2ee",
     "version": [
       1,

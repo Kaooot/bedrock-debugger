@@ -815,7 +815,7 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
     private void testPhotoTransfer(BedrockDebuggerProxy proxy) {
         final PhotoTransferPacket packet = new PhotoTransferPacket();
         packet.setPhotoName("Photo");
-        packet.setPhotoData("");
+        packet.setPhotoData(new byte[0]);
         packet.setBookID("id");
         packet.setType(PhotoType.BOOK);
         packet.setSourceType(PhotoType.BOOK);

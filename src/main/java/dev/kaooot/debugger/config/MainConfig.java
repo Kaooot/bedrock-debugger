@@ -30,6 +30,8 @@ public class MainConfig extends Config {
     private ConnectionType connectionType = ConnectionType.DEFAULT;
     @SerializedName("experience_id")
     private String experienceId = "";
+    @SerializedName("transport_type")
+    private TransportType transportType = TransportType.NETHERNET;
 
     public MainConfig() {
 
@@ -42,11 +44,17 @@ public class MainConfig extends Config {
 
     @Override
     public Config getDefaults() {
-        return new MainConfig("127.0.0.1", 19132, "0.0.0.0", 19122, "", ConnectionType.DEFAULT, "");
+        return new MainConfig("127.0.0.1", 19132, "0.0.0.0", 19122, "", ConnectionType.DEFAULT, "",
+            TransportType.NETHERNET);
     }
 
     public enum ConnectionType {
         DEFAULT,
         EXPERIENCE
+    }
+
+    public enum TransportType {
+        RAKNET,
+        NETHERNET
     }
 }

@@ -35,8 +35,6 @@ public class DebugHttpServer {
                 this.invokeListeners(ListenerType.ITEM_TAGS, exchange.getRequestBody()));
             this.server.createContext("/block_tags", exchange ->
                 this.invokeListeners(ListenerType.BLOCK_TAGS, exchange.getRequestBody()));
-            this.server.createContext("/block_states", exchange ->
-                this.invokeListeners(ListenerType.BLOCKS, exchange.getRequestBody()));
             this.server.setExecutor(null);
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +71,6 @@ public class DebugHttpServer {
 
     public enum ListenerType {
         ITEM_TAGS,
-        BLOCK_TAGS,
-        BLOCKS
+        BLOCK_TAGS
     }
 }
