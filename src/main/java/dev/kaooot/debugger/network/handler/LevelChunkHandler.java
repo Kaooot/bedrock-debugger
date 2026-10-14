@@ -40,7 +40,7 @@ public class LevelChunkHandler implements PacketHandler<LevelChunkPacket> {
                                 DimensionType dimension, int subChunksCount, LevelChunk levelChunk,
                                 ByteBuf serializedChunkData, PlayerChunkManager manager) {
         final int heightMinimum = proxy.getPlayer().getDimensionDefinition()
-            .getHeightMinimum();
+            .getMinimumY();
         try {
             for (int i = 0; i < subChunksCount; i++) {
                 final int subChunkIndex = i + (heightMinimum >> 4);

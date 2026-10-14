@@ -85,11 +85,6 @@ public class ProxiedClient {
             .getTransportType();
 
         if (this.transportType == MainConfig.TransportType.NETHERNET) {
-            // NetherNet carries an identity assertion in the SDP offer. The proxy asserts its own
-            // authenticated account (the same one it logs into the remote server as), which is
-            // known as soon as auth has run, so the connect happens here at boot like RakNet. The
-            // early handshake packets the upstream client sends (RequestNetworkSettings, Login) are
-            // forwarded to this downstream connection, so it must exist before they arrive.
             final AuthExtraData identity = AuthExtraData.fromChain(
                 this.proxy.getMsaAuth().generateLoginChain(
                     (ECPublicKey) this.proxy.getKeyPair().getPublic(),
@@ -171,14 +166,6 @@ public class ProxiedClient {
         System.exit(0);
     }
 
-    /**
-     * Connects to the downstream server over NetherNet. Called from the login flow, once the
-     * authenticated identity is known, because NetherNet carries that identity in the SDP offer.
-     * The remote address is the server's HTTP signaling endpoint (TCP), not a RakNet UDP port.
-     *
-     * @param xuid the authenticated player's XUID, asserted to the remote server
-     * @param name the authenticated player's name, asserted to the remote server
-     */
     public void connectNetherNet(String xuid, String name) {
         final OperatorIdentity identity;
         try {
@@ -189,17 +176,12 @@ public class ProxiedClient {
             return;
         }
 
-        // Force plaintext HTTP signaling: the AUTO scheme's capability probe appends a query to
-        // GET /v1/join, and a dedicated server's HTTP router 404s any /v1/join with a query string.
-        // A non-AUTO scheme skips the probe and goes straight to POST /v1/join/{networkId}, which a
-        // local server serves over plain HTTP.
         final HttpSignalingSettings signalingSettings =
             HttpSignalingSettings.DEFAULT.withScheme(HttpSignalingSettings.Scheme.HTTP);
 
         final NioEventLoopGroup group = new NioEventLoopGroup();
         final ChannelFuture channelFuture = new Bootstrap()
             .group(group)
-            // A fresh signaling per channel, so the bootstrap could be reused for a reconnect.
             .channelFactory(NetherNetChannelFactory.client(
                 () -> new NetherNetHTTPClientSignaling(signalingSettings)
             ))
@@ -264,11 +246,6 @@ public class ProxiedClient {
 
     public void enableEncryption(SecretKey key) {
         if (this.transportType == MainConfig.TransportType.NETHERNET) {
-            // NetherNet already runs inside DTLS, so the server does not actually switch its own
-            // cipher on even when it sends a ServerToClientHandshake. Enabling Bedrock encryption
-            // here would desynchronize the stream (the connection then stalls and times out). The
-            // ClientToServerHandshake reply is still sent by the handler, unencrypted, which the
-            // server accepts. This mirrors WaterdogPE's NetherNetClientConnection.
             this.proxy.getLogger().warn(
                 "Ignoring Bedrock encryption handshake over NetherNet (transport is already encrypted)"
             );

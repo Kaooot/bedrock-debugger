@@ -16,16 +16,9 @@ import org.cloudburstmc.protocol.bedrock.netty.codec.compression.SimpleCompressi
 import org.cloudburstmc.protocol.bedrock.netty.codec.packet.BedrockPacketCodec;
 import org.cloudburstmc.protocol.bedrock.netty.codec.packet.BedrockPacketCodec_v3;
 
-/**
- * Builds a Bedrock pipeline over a NetherNet channel. It is identical to the stock
- * {@code BedrockChannelInitializer} above the frame codec: the only NetherNet-specific piece is
- * {@link NetherNetFrameCodec} (a pass-through) in place of the RakNet {@code FrameIdCodec}, so the
- * stock compression, batch, packet and encryption codecs and {@code BedrockPeer} are reused as-is.
- */
 public abstract class BedrockNetherNetChannelInitializer<T extends BedrockSession> extends ChannelInitializer<Channel> {
 
     private static final BedrockBatchDecoder BATCH_DECODER = new BedrockBatchDecoder();
-    // No compression until NetworkSettings, matching the stock pipeline's initial state.
     private static final CompressionStrategy NOOP_STRATEGY = new SimpleCompressionStrategy(new NoopCompression());
 
     @Override
@@ -33,8 +26,6 @@ public abstract class BedrockNetherNetChannelInitializer<T extends BedrockSessio
         this.preInitChannel(channel);
 
         channel.pipeline()
-                // Registered under FrameIdCodec.NAME so BedrockPeer.enableEncryption inserts the
-                // encryption handlers right after it, ahead of the compression codec, as on RakNet.
                 .addLast(FrameIdCodec.NAME, NetherNetFrameCodec.INSTANCE)
                 .addLast(CompressionCodec.NAME, new CompressionCodec(NOOP_STRATEGY, false))
                 .addLast(BedrockBatchDecoder.NAME, BATCH_DECODER)

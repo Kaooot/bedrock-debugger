@@ -125,12 +125,8 @@ public class ProxiedServer {
         try {
             signaling = new NetherNetHTTPServerSignaling.Builder()
                 .setIdentity(NetherNetIdentity.get())
-                // Serve the /v1/join endpoint ourselves over the bind port.
                 .setServeHttp(true)
-                // Accept a peer's self-signed assertion; the debugger is not an auth service.
                 .setTokenTrust(TokenTrust.ANY)
-                // RakNet is not bound in NetherNet mode, so ICE may share the signaling port
-                // (iceOnLocalPort defaults to true), and no separate media port is needed.
                 .setMotd(pong)
                 .build();
         } catch (Exception e) {

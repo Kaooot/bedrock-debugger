@@ -7,7 +7,7 @@ import org.cloudburstmc.math.vector.Vector3i;
 import org.cloudburstmc.protocol.bedrock.data.ability.AbilitiesIndex;
 import org.cloudburstmc.protocol.bedrock.data.ability.SerializedAbilitiesData;
 import org.cloudburstmc.protocol.bedrock.data.ability.SerializedAbilitiesDataSerializedLayer;
-import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.InventoryTransactionDataType;
+import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.InventoryTransactionType;
 import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.ItemUseOnActorActionType;
 import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.ItemUseOnActorInventoryTransaction;
 import org.cloudburstmc.protocol.bedrock.data.map.ClientPixelsProxy;
@@ -91,13 +91,8 @@ public class CheatClientAuthority {
         if (!this.settings.isCpsOverrideEnabled()) {
             return false;
         }
-        if (!packet.getTransaction().getType()
-            .equals(InventoryTransactionDataType.ITEM_USE_ON_ACTOR)) {
-            return false;
-        }
-        final ItemUseOnActorInventoryTransaction transaction =
-            (ItemUseOnActorInventoryTransaction) packet.getTransaction();
-        if (!transaction.getActionType().equals(ItemUseOnActorActionType.ATTACK)) {
+        if (!(packet.getTransaction() instanceof ItemUseOnActorInventoryTransaction transaction) ||
+            !transaction.getActionType().equals(ItemUseOnActorActionType.ATTACK)) {
             return false;
         }
         for (int i = 0; i < this.settings.getClicksPerSecond(); i++) {

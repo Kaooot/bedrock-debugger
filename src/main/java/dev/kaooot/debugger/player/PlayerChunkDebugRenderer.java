@@ -84,7 +84,7 @@ public class PlayerChunkDebugRenderer {
         final DimensionDefinition target = this.player.getDimensionDefinition();
         if (newToggleValue) {
             final DebugBox chunkOutlineBox = this.createChunkRenderDebugBox(
-                target.getHeightMinimum(), target.getHeightMaximum(), false
+                target.getMinimumY(), target.getMaximumY(), false
             );
             final DebugBox subChunkOutlineBox = this.createChunkRenderDebugBox(0, 0, true);
 
@@ -100,7 +100,8 @@ public class PlayerChunkDebugRenderer {
     }
 
     public void updateChunkPosForRenderingIfEnabled(SettingsConfig config) {
-        if (!config.isRenderCurrentChunk() || this.player.getDimension().asEnum().equals(Dimension.UNDEFINED)) {
+        if (!config.isRenderCurrentChunk() ||
+            this.player.getDimension().asEnum().equals(Dimension.UNDEFINED)) {
             return;
         }
         final DimensionDefinition target = this.player.getDimensionDefinition();
@@ -110,7 +111,7 @@ public class PlayerChunkDebugRenderer {
             .getShape(SUB_CHUNK_POS_RENDER_SHAPE_ID, DebugBox.class);
         if (chunkOutlineBox == null || subChunkOutlineBox == null) {
             chunkOutlineBox = this.createChunkRenderDebugBox(
-                target.getHeightMinimum(), target.getHeightMaximum(), false
+                target.getMinimumY(), target.getMaximumY(), false
             );
             subChunkOutlineBox = this.createChunkRenderDebugBox(0, 0, true);
         } else {
@@ -121,7 +122,8 @@ public class PlayerChunkDebugRenderer {
                 chunkOutlineBox.setLocation(
                     Vector3f.from(
                         (this.player.getChunkX() << 4) + CHUNK_WIDTH_HALF,
-                        (target.getHeightMaximum() + target.getHeightMinimum()) / 2f,
+                        (target.getMinimumY() + target.getMaximumY()) /
+                            2f,
                         (this.player.getChunkZ() << 4) + CHUNK_WIDTH_HALF
                     )
                 );
@@ -131,8 +133,7 @@ public class PlayerChunkDebugRenderer {
                 subChunkOutlineBox.setLocation(
                     Vector3f.from(
                         (this.player.getChunkX() << 4) + CHUNK_WIDTH_HALF,
-                        (this.ensureBoundsChunkY(target.getHeightMinimum(),
-                            target.getHeightMaximum()) *
+                        (this.ensureBoundsChunkY(target.getMinimumY(), target.getMaximumY()) *
                             SUB_CHUNK_HEIGHT) + (SUB_CHUNK_HEIGHT / 2f),
                         (this.player.getChunkZ() << 4) + CHUNK_WIDTH_HALF
                     )
