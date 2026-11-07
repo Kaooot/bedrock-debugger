@@ -386,7 +386,7 @@ public class RecipeUtil {
                 return itemDefinition.getIdentifier();
             }
         }
-        return null;
+        return "minecraft:air";
     }
 
     @Value
