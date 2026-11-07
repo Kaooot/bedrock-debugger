@@ -204,6 +204,7 @@ import org.cloudburstmc.protocol.bedrock.packet.NpcRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.OnScreenTextureAnimationPacket;
 import org.cloudburstmc.protocol.bedrock.packet.OpenSignPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PhotoTransferPacket;
+import org.cloudburstmc.protocol.bedrock.data.sound.PlaySoundPacketPayload;
 import org.cloudburstmc.protocol.bedrock.packet.PlaySoundPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerActionPacket;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerArmorDamagePacket;
@@ -779,10 +780,12 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testPlaySound(BedrockDebuggerProxy proxy) {
         final PlaySoundPacket packet = new PlaySoundPacket();
-        packet.setName("mob.zombie.death");
-        packet.setPosition(proxy.getPlayer().getPosition());
-        packet.setVolume(1.0f);
-        packet.setPitch(1.0f);
+        final PlaySoundPacketPayload payload = new PlaySoundPacketPayload();
+        payload.setName("mob.zombie.death");
+        payload.setPosition(proxy.getPlayer().getPosition().toInt());
+        payload.setVolume(1.0f);
+        payload.setPitch(1.0f);
+        packet.setPayload(payload);
         proxy.getServer().sendPacket(packet);
     }
 
@@ -808,7 +811,6 @@ public class TestPacketsCommand extends Command<BedrockDebuggerProxy> {
 
     private void testSetLastHurtBy(BedrockDebuggerProxy proxy) {
         final SetLastHurtByPacket packet = new SetLastHurtByPacket();
-        packet.setLastHurtBy(ActorType.CREEPER);
         proxy.getServer().sendPacket(packet);
     }
 

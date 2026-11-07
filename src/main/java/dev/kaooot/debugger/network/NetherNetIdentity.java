@@ -1,6 +1,7 @@
 package dev.kaooot.debugger.network;
 
 import java.io.File;
+import java.security.KeyPair;
 import org.cloudburstmc.netty.util.nethernet.OperatorIdentity;
 
 /**
@@ -33,6 +34,16 @@ public final class NetherNetIdentity {
                 }
             }
             return identity;
+        }
+    }
+
+    public static OperatorIdentity forKeyPair(KeyPair keyPair) {
+        try {
+            return new OperatorIdentity(keyPair.getPrivate(), keyPair.getPublic(), null, DOMAIN);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Failed to build the NetherNet identity from the key pair", e
+            );
         }
     }
 }

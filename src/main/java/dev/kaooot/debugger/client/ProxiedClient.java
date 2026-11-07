@@ -169,7 +169,7 @@ public class ProxiedClient {
     public void connectNetherNet(String xuid, String name) {
         final OperatorIdentity identity;
         try {
-            identity = NetherNetIdentity.get().forPlayer(xuid, name);
+            identity = NetherNetIdentity.forKeyPair(this.proxy.getKeyPair()).forPlayer(xuid, name);
         } catch (Exception e) {
             this.proxy.getLogger().error("Failed to build the NetherNet identity assertion", e);
             System.exit(0);
