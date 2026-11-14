@@ -19,13 +19,20 @@ import dev.kaooot.debugger.api.shape.DebugText;
 import dev.kaooot.debugger.menu.ServerSettingsMenu;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import org.cloudburstmc.math.vector.Vector2f;
 import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorDataTypes;
 import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
 import org.cloudburstmc.protocol.bedrock.data.command.CommandParamType;
+import org.cloudburstmc.protocol.bedrock.data.connection.TransferPlayerUIOptions;
+import org.cloudburstmc.protocol.bedrock.data.inventory.ItemData;
 import org.cloudburstmc.protocol.bedrock.data.shape.ScriptPrimitiveShapeType;
+import org.cloudburstmc.protocol.bedrock.packet.PlayerToggleArmorVisibilityRequestPacket;
 import org.cloudburstmc.protocol.bedrock.packet.SetActorDataPacket;
+import org.cloudburstmc.protocol.bedrock.packet.TransferPacket;
+import org.cloudburstmc.protocol.bedrock.packet.VirtualContainerOpenPacket;
+import org.cloudburstmc.protocol.common.util.OptionalBoolean;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -45,6 +52,8 @@ import org.cloudburstmc.protocol.bedrock.packet.SetActorDataPacket;
                 @CommandEnumValue(name = "shapes"),
                 @CommandEnumValue(name = "sleeping"),
                 @CommandEnumValue(name = "sleeping_actorflag"),
+                @CommandEnumValue(name = "armor"),
+                @CommandEnumValue(name = "in_memory_container"),
             }))
     })
 })
@@ -196,6 +205,41 @@ public class TestCommand extends Command<BedrockDebuggerProxy> {
                         proxy.getPlayer().sendMessage(resetPacket.toString());
                     }, 0, 2);
                 }, 0, 40);
+                case "armor" -> {
+                    final PlayerToggleArmorVisibilityRequestPacket packet =
+                        new PlayerToggleArmorVisibilityRequestPacket();
+                    packet.setHideArmor(true);
+
+                    proxy.getClient().sendPacket(packet);
+                    proxy.getPlayer().sendMessage(packet.toString());
+                }
+                case "in_memory_container" -> {
+                    final VirtualContainerOpenPacket packet = new VirtualContainerOpenPacket();
+                    packet.setContainerId(ThreadLocalRandom.current().nextInt(1, 9999));
+                    packet.setSessionId(ThreadLocalRandom.current().nextLong(1, 9999));
+                    packet.setTitle("Title");
+                    packet.getSlots().add(ItemData.AIR);
+
+                    proxy.getServer().sendPacket(packet);
+                    proxy.getPlayer().sendMessage(packet.toString());
+                }
+                case "transfer" -> {
+                    final TransferPlayerUIOptions options = new TransferPlayerUIOptions();
+                    options.setTitleText("Title");
+                    options.setBodyText("Body");
+                    options.setTitleVisible(OptionalBoolean.of(true));
+                    options.setBodyVisible(OptionalBoolean.of(true));
+                    options.setCancelButtonVisible(OptionalBoolean.of(true));
+                    options.setCancelButtonDelaySeconds(1f);
+                    options.setCancelButtonText("Cancel this");
+
+                    final TransferPacket packet = new TransferPacket();
+                    packet.setServerAddress("127.0.0.1");
+                    packet.setServerPort(19122);
+                    packet.setServerTransferSettings(options);
+
+                    proxy.getServer().sendPacket(packet);
+                }
             }
         }
     }

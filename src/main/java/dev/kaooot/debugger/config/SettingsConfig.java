@@ -81,6 +81,8 @@ public class SettingsConfig extends Config {
     private PlatformType platformType = PlatformType.MOBILE;
     @SerializedName("log_level")
     private String logLevel = "INFO";
+    @SerializedName("managed_chat_enabled")
+    private boolean managedChatEnabled;
 
     @Override
     public String getName() {

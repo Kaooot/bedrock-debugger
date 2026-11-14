@@ -113,6 +113,11 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             "Whether server auth block breaking is disabled. Defaults to false."
         );
 
+        final Toggle managedChatToggle = new Toggle();
+        managedChatToggle.setId("toggle-managed_chat");
+        managedChatToggle.setText("Managed Chat Enabled");
+        managedChatToggle.setDefaultValue(settingsConfig.isManagedChatEnabled());
+
         final Toggle spoofDeviceIDToggle = new Toggle();
         spoofDeviceIDToggle.setId("toggle-spoof_device_id");
         spoofDeviceIDToggle.setText("Should Spoof DeviceId");
@@ -330,6 +335,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
                 staticLabel,
                 blobCacheToggle, printDebugInfoToggle, packsToggle,
                 forceDisableServerAuthBlockBreakingToggle,
+                managedChatToggle,
                 divider,
                 generalSectionLabel,
                 commandsToggle, renderBuildInfoToggle, renderExperimentInfoToggle,
@@ -430,6 +436,7 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
         final int platformTypeOrdinal = Integer.parseInt(
             response.getStepSliderResponse("slider-platform_type")
         );
+        final boolean forceEnableManagedChat = response.getToggleResponse("toggle-managed_chat");
 
         this.updateToggle(blobCache, settingsConfig.isClientBlobCacheEnabled(),
             settingsConfig::setClientBlobCacheEnabled, proxy, "Client Blob Cache");
@@ -593,6 +600,14 @@ public class ServerSettingsMenu implements FormMenu<BedrockDebuggerProxy> {
             settingsConfig::setForceDisableServerAuthBlockBreaking,
             proxy,
             "Force Disable Server Auth Block Breaking"
+        );
+
+        this.updateToggle(
+            forceEnableManagedChat,
+            settingsConfig.isManagedChatEnabled(),
+            settingsConfig::setManagedChatEnabled,
+            proxy,
+            "Managed Chat Enabled"
         );
 
         configRegistry.save(settingsConfig);

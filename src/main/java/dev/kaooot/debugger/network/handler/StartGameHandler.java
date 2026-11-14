@@ -13,6 +13,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtType;
+import org.cloudburstmc.protocol.bedrock.data.connection.ManagedChatJoinInfo;
+import org.cloudburstmc.protocol.bedrock.data.connection.ServerConfig;
 import org.cloudburstmc.protocol.bedrock.data.player.input.SyncedPlayerMovementSettings;
 import org.cloudburstmc.protocol.bedrock.data.world.ExperimentToggle;
 import org.cloudburstmc.protocol.bedrock.data.world.ServerBlockProperty;
@@ -110,6 +112,15 @@ public class StartGameHandler implements PacketHandler<StartGamePacket> {
                 )
             );
         }
+
+        final ManagedChatJoinInfo managedChatJoinInfo = new ManagedChatJoinInfo();
+        managedChatJoinInfo.setEnabled(settingsConfig.isManagedChatEnabled());
+
+        final ServerConfig serverConfig = packet.getServerConfigurationJoinInfo() == null ?
+            new ServerConfig() : packet.getServerConfigurationJoinInfo();
+        serverConfig.setManagedChat(managedChatJoinInfo);
+
+        packet.setServerConfigurationJoinInfo(serverConfig);
 
         proxy.getServer().sendPacket(packet);
         return PacketSignal.HANDLED;

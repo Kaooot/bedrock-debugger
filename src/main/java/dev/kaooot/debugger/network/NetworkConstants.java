@@ -2,7 +2,7 @@ package dev.kaooot.debugger.network;
 
 import lombok.experimental.UtilityClass;
 import org.cloudburstmc.protocol.bedrock.codec.BedrockCodec;
-import org.cloudburstmc.protocol.bedrock.codec.v2225.Bedrock_v2225;
+import org.cloudburstmc.protocol.bedrock.codec.v2259.Bedrock_v2259;
 import org.cloudburstmc.protocol.bedrock.data.EncodingSettings;
 
 /**
@@ -13,6 +13,6 @@ import org.cloudburstmc.protocol.bedrock.data.EncodingSettings;
 @UtilityClass
 public class NetworkConstants {
 
-    public final BedrockCodec CODEC = Bedrock_v2225.CODEC;
+    public final BedrockCodec CODEC = Bedrock_v2259.CODEC;
     public final EncodingSettings ENCODING_SETTINGS = EncodingSettings.UNLIMITED;
 }
