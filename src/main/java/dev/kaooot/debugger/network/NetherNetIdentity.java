@@ -1,5 +1,6 @@
 package dev.kaooot.debugger.network;
 
+import com.nimbusds.jwt.SignedJWT;
 import java.io.File;
 import java.security.KeyPair;
 import org.cloudburstmc.netty.util.nethernet.OperatorIdentity;
@@ -37,12 +38,15 @@ public final class NetherNetIdentity {
         }
     }
 
-    public static OperatorIdentity forKeyPair(KeyPair keyPair) {
+    public static OperatorIdentity forToken(KeyPair keyPair, String signedToken) {
         try {
-            return new OperatorIdentity(keyPair.getPrivate(), keyPair.getPublic(), null, DOMAIN);
+            final String issuer = SignedJWT.parse(signedToken).getJWTClaimsSet().getIssuer();
+            return OperatorIdentity.fromToken(
+                keyPair, signedToken, issuer != null ? issuer : DOMAIN
+            );
         } catch (Exception e) {
             throw new RuntimeException(
-                "Failed to build the NetherNet identity from the key pair", e
+                "Failed to build the NetherNet identity from the multiplayer token", e
             );
         }
     }

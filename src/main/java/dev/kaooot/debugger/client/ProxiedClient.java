@@ -1,13 +1,11 @@
 package dev.kaooot.debugger.client;
 
-import dev.kaooot.debugger.api.auth.util.AuthExtraData;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoop;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import java.net.InetSocketAddress;
-import java.security.interfaces.ECPublicKey;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.crypto.SecretKey;
 import lombok.Getter;
@@ -41,6 +39,7 @@ import dev.kaooot.debugger.core.registry.RegistryKey;
 import dev.kaooot.debugger.network.NetherNetIdentity;
 import dev.kaooot.debugger.network.NetworkConstants;
 import dev.kaooot.debugger.network.ProxiedPacketHandler;
+import dev.kaooot.debugger.util.BedrockGameVersion;
 
 /**
  * Copyright (c) Kaooot. All rights reserved.
@@ -85,13 +84,13 @@ public class ProxiedClient {
             .getTransportType();
 
         if (this.transportType == MainConfig.TransportType.NETHERNET) {
-            final AuthExtraData identity = AuthExtraData.fromChain(
-                this.proxy.getMsaAuth().generateLoginChain(
-                    (ECPublicKey) this.proxy.getKeyPair().getPublic(),
-                    NetworkConstants.CODEC.getMinecraftVersion()
-                )
+            this.proxy.getAuthServiceConnection().startSession(
+                BedrockGameVersion.from(NetworkConstants.CODEC.getMinecraftVersion()), false
             );
-            this.connectNetherNet(identity.getXuid(), identity.getDisplayName());
+            this.proxy.getAuthServiceConnection().startMultiplayerSession();
+            final String signedToken = this.proxy.getAuthServiceConnection()
+                .getMultiplayerResult().getResult().getSignedToken();
+            this.connectNetherNet(NetherNetIdentity.forToken(this.proxy.getKeyPair(), signedToken));
             return;
         }
 
@@ -166,18 +165,17 @@ public class ProxiedClient {
         System.exit(0);
     }
 
-    public void connectNetherNet(String xuid, String name) {
-        final OperatorIdentity identity;
-        try {
-            identity = NetherNetIdentity.forKeyPair(this.proxy.getKeyPair()).forPlayer(xuid, name);
-        } catch (Exception e) {
-            this.proxy.getLogger().error("Failed to build the NetherNet identity assertion", e);
-            System.exit(0);
-            return;
-        }
-
-        final HttpSignalingSettings signalingSettings =
-            HttpSignalingSettings.DEFAULT.withScheme(HttpSignalingSettings.Scheme.HTTP);
+    public void connectNetherNet(OperatorIdentity identity) {
+        final MainConfig.SignalingScheme configuredScheme =
+            Registries.<ConfigRegistry>getRegistry(RegistryKey.CONFIG)
+                .get(MainConfig.class)
+                .getSignalingScheme();
+        final HttpSignalingSettings signalingSettings = HttpSignalingSettings.DEFAULT.withScheme(
+            switch (configuredScheme) {
+                case HTTP -> HttpSignalingSettings.Scheme.HTTP;
+                case HTTPS -> HttpSignalingSettings.Scheme.HTTPS;
+                default -> HttpSignalingSettings.Scheme.AUTO;
+            });
 
         final NioEventLoopGroup group = new NioEventLoopGroup();
         final ChannelFuture channelFuture = new Bootstrap()

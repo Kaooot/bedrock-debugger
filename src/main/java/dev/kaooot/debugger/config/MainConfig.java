@@ -32,6 +32,8 @@ public class MainConfig extends Config {
     private String experienceId = "";
     @SerializedName("transport_type")
     private TransportType transportType = TransportType.NETHERNET;
+    @SerializedName("nethernet_signaling_scheme")
+    private SignalingScheme signalingScheme = SignalingScheme.AUTO;
 
     public MainConfig() {
 
@@ -45,7 +47,7 @@ public class MainConfig extends Config {
     @Override
     public Config getDefaults() {
         return new MainConfig("127.0.0.1", 19132, "0.0.0.0", 19122, "", ConnectionType.DEFAULT, "",
-            TransportType.NETHERNET);
+            TransportType.NETHERNET, SignalingScheme.AUTO);
     }
 
     public enum ConnectionType {
@@ -56,5 +58,11 @@ public class MainConfig extends Config {
     public enum TransportType {
         RAKNET,
         NETHERNET
+    }
+
+    public enum SignalingScheme {
+        AUTO,
+        HTTP,
+        HTTPS
     }
 }
